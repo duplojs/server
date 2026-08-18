@@ -1,0 +1,6 @@
+{
+  "name": "integrations",
+  "dependencies": {
+    "@duplojs/server": "file:.."
+  }
+}

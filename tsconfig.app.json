@@ -1,0 +1,11 @@
+{
+  "extends": "@duplojs/code-config/tsconfig/base.json",
+  "compilerOptions": {
+	"types": ["node", "deno", "bun"],
+    "paths": {
+	  "@scripts": ["./scripts/index.ts"],
+      "@scripts/*": ["./scripts/*"],
+    },
+  },
+  "include": ["./scripts/**/*.ts"],
+}

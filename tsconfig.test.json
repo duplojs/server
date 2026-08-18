@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+	"types": ["vitest/globals", "node", "deno", "bun"],
+    "paths": {
+	  "@scripts": ["./scripts/index.ts"],
+      "@scripts/*": ["./scripts/*"],
+      "@test/*": ["./test/*"],
+    },
+  },
+  "include": [
+	"tests/**/*.ts",
+	"scripts/**/*.ts", 
+	"integrations/**/*.ts",
+  ],
+}
