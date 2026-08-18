@@ -1,6 +1,6 @@
-import { type RemoveKind, type Kind, unwrap } from "@duplojs/utils";
-import * as EE from "@duplojs/utils/either";
-import type * as DDP from "@duplojs/utils/dataParser";
+import { type RemoveKind, type Kind, unwrap } from "@duplojs/lang";
+import * as EE from "@duplojs/lang/either";
+import type * as DDP from "@duplojs/lang/dataParser";
 import { createDuplojsServerUtilsKind } from "@scripts/kind";
 import type { EligibleSpec, EligibleSpecOutput } from "./types";
 import { addIssue, addIssueDataParser, type CommandError, type SymbolCommandError } from "./error";

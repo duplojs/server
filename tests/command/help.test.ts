@@ -1,4 +1,4 @@
-import { DP, Printer } from "@duplojs/utils";
+import { DP, Printer } from "@duplojs/lang";
 import { DServerCommand, DServerDataParser } from "@scripts";
 import { formatDataParser, logCommandHelp, logExecOptionHelp, renderArgumentsHelp, renderCommandHelp, renderExecOptionHelp } from "@scripts/command/help";
 

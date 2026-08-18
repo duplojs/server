@@ -1,4 +1,4 @@
-import { type ExpectType, DP } from "@duplojs/utils";
+import { type ExpectType, DP } from "@duplojs/lang";
 import { setEnvironment } from "@scripts";
 import { EnvironmentVariableError, environmentVariableOrThrow } from "@scripts/common";
 import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";

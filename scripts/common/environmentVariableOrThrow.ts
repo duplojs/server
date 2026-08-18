@@ -1,6 +1,6 @@
-import { kindHeritage, unwrap } from "@duplojs/utils";
-import * as EE from "@duplojs/utils/either";
-import type * as DDP from "@duplojs/utils/dataParser";
+import { kindHeritage, unwrap } from "@duplojs/lang";
+import * as EE from "@duplojs/lang/either";
+import type * as DDP from "@duplojs/lang/dataParser";
 import { createDuplojsServerUtilsKind } from "@scripts/kind";
 import type * as SF from "@scripts/file";
 import { type EnvironmentVariableFileParams, environmentVariable } from "./environmentVariable";

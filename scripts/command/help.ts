@@ -1,7 +1,7 @@
-import { justReturn, pipe, Printer } from "@duplojs/utils";
-import * as AA from "@duplojs/utils/array";
-import * as PP from "@duplojs/utils/pattern";
-import * as DDP from "@duplojs/utils/dataParser";
+import { justReturn, pipe, Printer } from "@duplojs/lang";
+import * as AA from "@duplojs/lang/array";
+import * as PP from "@duplojs/lang/pattern";
+import * as DDP from "@duplojs/lang/dataParser";
 import * as SDP from "@scripts/dataParser";
 import type { Command } from "./create";
 import type { Argument } from "./argument";

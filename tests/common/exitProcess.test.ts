@@ -1,4 +1,4 @@
-import { type ExpectType, pipe } from "@duplojs/utils";
+import { type ExpectType, pipe } from "@duplojs/lang";
 import { exitProcess, setEnvironment } from "@scripts";
 
 describe("exitProcess", () => {

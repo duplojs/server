@@ -1,4 +1,4 @@
-import { E, type ExpectType, C, DP, S, unwrap } from "@duplojs/utils";
+import { E, type ExpectType, C, DP, S, unwrap } from "@duplojs/lang";
 import { DServerCommand, DServerDataParser, DServerFile, TESTImplementation, setEnvironment } from "@scripts";
 import { createError, SymbolCommandError } from "@scripts/command/error";
 

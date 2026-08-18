@@ -1,5 +1,5 @@
-import * as EE from "@duplojs/utils/either";
-import * as DD from "@duplojs/utils/date";
+import * as EE from "@duplojs/lang/either";
+import * as DD from "@duplojs/lang/date";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 

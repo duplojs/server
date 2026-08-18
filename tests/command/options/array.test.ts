@@ -1,4 +1,4 @@
-import { E, type ExpectType, C, DP, pipe, S, unwrap, type AnyTuple } from "@duplojs/utils";
+import { E, type ExpectType, C, DP, pipe, S, unwrap, type AnyTuple } from "@duplojs/lang";
 import { DServerCommand, DServerDataParser, type DServerFile, TESTImplementation, setEnvironment } from "@scripts";
 import { createError, SymbolCommandError } from "@scripts/command/error";
 

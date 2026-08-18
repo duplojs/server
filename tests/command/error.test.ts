@@ -1,4 +1,4 @@
-import { DP, E, type ExpectType, unwrap } from "@duplojs/utils";
+import { DP, E, type ExpectType, unwrap } from "@duplojs/lang";
 import { SymbolCommandError, addIssue, addIssueDataParser, createError, interpretCommandError, interpretExecOptionError } from "@scripts/command/error";
 
 describe("error", () => {

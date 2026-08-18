@@ -1,4 +1,4 @@
-import type * as DDP from "@duplojs/utils/dataParser";
+import type * as DDP from "@duplojs/lang/dataParser";
 import type { ComputeEligibleCleanType, EligibleCleanType, EligibleSpec } from "../../types";
 
 export type ComputeOptionSpec<

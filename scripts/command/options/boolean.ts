@@ -1,4 +1,4 @@
-import { type RemoveKind, type Kind } from "@duplojs/utils";
+import { type RemoveKind, type Kind } from "@duplojs/lang";
 import { initOption, type Option } from "./base";
 import { createDuplojsServerUtilsKind } from "@scripts/kind";
 

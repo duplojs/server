@@ -1,6 +1,6 @@
-import type { AnyTuple, SimplifyTopLevel } from "@duplojs/utils";
-import * as GG from "@duplojs/utils/generator";
-import * as OO from "@duplojs/utils/object";
+import type { AnyTuple, SimplifyTopLevel } from "@duplojs/lang";
+import * as GG from "@duplojs/lang/generator";
+import * as OO from "@duplojs/lang/object";
 import { createError, interpretExecOptionError, SymbolCommandError } from "./error";
 import { logExecOptionHelp, helpOption } from "./help";
 import type { Option } from "./options";

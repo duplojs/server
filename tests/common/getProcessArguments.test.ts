@@ -1,4 +1,4 @@
-import { type ExpectType, pipe } from "@duplojs/utils";
+import { type ExpectType, pipe } from "@duplojs/lang";
 import { clearBunMock } from "tests/_utils/bun.mock";
 
 describe("getProcessArguments", () => {

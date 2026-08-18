@@ -1,7 +1,7 @@
-import { type Kind, type AnyFunction, type RemoveKind, type MaybePromise, type AnyTuple, justExec, type ComputedTypeError, type IsEqual, type And, type Not, type UnionContain, type NeverCoalescing } from "@duplojs/utils";
-import * as AA from "@duplojs/utils/array";
-import * as GG from "@duplojs/utils/generator";
-import * as OO from "@duplojs/utils/object";
+import { type Kind, type AnyFunction, type RemoveKind, type MaybePromise, type AnyTuple, justExec, type ComputedTypeError, type IsEqual, type And, type Not, type UnionContain, type NeverCoalescing } from "@duplojs/lang";
+import * as AA from "@duplojs/lang/array";
+import * as GG from "@duplojs/lang/generator";
+import * as OO from "@duplojs/lang/object";
 import { createDuplojsServerUtilsKind } from "@scripts/kind";
 import { exitProcess } from "@scripts/common/exitProcess";
 import type { Option } from "./options";

@@ -1,6 +1,6 @@
-import { callThen, detachObjectMethod, unwrap } from "@duplojs/utils";
-import * as DDataParser from "@duplojs/utils/dataParser";
-import * as DEither from "@duplojs/utils/either";
+import { callThen, detachObjectMethod, unwrap } from "@duplojs/lang";
+import * as DDataParser from "@duplojs/lang/dataParser";
+import * as DEither from "@duplojs/lang/either";
 import type * as DServerFile from "@scripts/file";
 import { createDataParserKind } from "@scripts/dataParser/kind";
 

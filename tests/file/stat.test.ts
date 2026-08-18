@@ -1,4 +1,4 @@
-import { E, unwrap } from "@duplojs/utils";
+import { E, unwrap } from "@duplojs/lang";
 import { DServerFile, setEnvironment } from "@scripts";
 import { setFsPromisesMock } from "../_utils/fsPromises.mock";
 import { setDenoMock } from "../_utils/deno.mock";

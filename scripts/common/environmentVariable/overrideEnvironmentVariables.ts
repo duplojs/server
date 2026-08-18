@@ -1,6 +1,6 @@
-import { pipe } from "@duplojs/utils";
-import * as OO from "@duplojs/utils/object";
-import * as AA from "@duplojs/utils/array";
+import { pipe } from "@duplojs/lang";
+import * as OO from "@duplojs/lang/object";
+import * as AA from "@duplojs/lang/array";
 
 export function overrideEnvironmentVariables(
 	arrayEnv: Record<string, string>[],

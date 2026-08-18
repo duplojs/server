@@ -1,4 +1,4 @@
-import { DP, type ExpectType } from "@duplojs/utils";
+import { DP, type ExpectType } from "@duplojs/lang";
 import { DServerCommand, TESTImplementation, setEnvironment } from "@scripts";
 
 describe("execOptions", () => {

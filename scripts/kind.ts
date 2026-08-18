@@ -1,6 +1,6 @@
-import { createKindNamespace } from "@duplojs/utils";
+import { createKindNamespace } from "@duplojs/lang";
 
-declare module "@duplojs/utils" {
+declare module "@duplojs/lang" {
 	interface ReservedKindNamespace {
 		DuplojsServerUtils: true;
 	}

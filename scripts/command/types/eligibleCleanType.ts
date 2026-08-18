@@ -1,6 +1,6 @@
-import type { AnyTuple } from "@duplojs/utils";
-import type * as CC from "@duplojs/utils/clean";
-import type * as DD from "@duplojs/utils/date";
+import type { AnyTuple } from "@duplojs/lang";
+import type * as CC from "@duplojs/lang/clean";
+import type * as DD from "@duplojs/lang/date";
 
 export type EligiblePrimitive = string | number | boolean | bigint | DD.TheDate | DD.TheTime;
 

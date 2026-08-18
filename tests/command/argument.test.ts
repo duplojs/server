@@ -1,4 +1,4 @@
-import { DP, E } from "@duplojs/utils";
+import { DP, E } from "@duplojs/lang";
 import { DServerCommand, DServerDataParser, TESTImplementation, setEnvironment } from "@scripts";
 import { SymbolCommandError, createError } from "@scripts/command/error";
 

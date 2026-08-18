@@ -1,5 +1,5 @@
-import { type NeverCoalescing, type FixDeepFunctionInfer, detachObjectMethod } from "@duplojs/utils";
-import * as DDataParser from "@duplojs/utils/dataParser";
+import { type NeverCoalescing, type FixDeepFunctionInfer, detachObjectMethod } from "@duplojs/lang";
+import * as DDataParser from "@duplojs/lang/dataParser";
 import * as DServerFile from "@scripts/file";
 import { createDataParserKind } from "../../kind";
 

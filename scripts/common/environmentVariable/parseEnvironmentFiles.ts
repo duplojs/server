@@ -1,7 +1,7 @@
-import { innerPipe, pipe, when } from "@duplojs/utils";
-import * as GG from "@duplojs/utils/generator";
-import * as SS from "@duplojs/utils/string";
-import * as EE from "@duplojs/utils/either";
+import { innerPipe, pipe, when } from "@duplojs/lang";
+import * as GG from "@duplojs/lang/generator";
+import * as SS from "@duplojs/lang/string";
+import * as EE from "@duplojs/lang/either";
 import * as SF from "@scripts/file";
 
 const lineRegex = /^(?:export\s+)?(?<key>[A-Z_][A-Z0-9_]*)=(?<value>'(?:\\'|[^'])*'|"(?:\\"|[^"])*"|`(?:\\`|[^`])*`|[^\s#\r\n][^#\r\n]*|)\s*(?:#.*)?$/mg;

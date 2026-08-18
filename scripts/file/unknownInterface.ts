@@ -1,5 +1,5 @@
-import { Path, type Kind } from "@duplojs/utils";
-import type * as EE from "@duplojs/utils/either";
+import { Path, type Kind } from "@duplojs/lang";
+import type * as EE from "@duplojs/lang/either";
 import { createDuplojsServerUtilsKind } from "@scripts/kind";
 import { stat, type StatInfo } from "./stat";
 import { exists } from "./exists";

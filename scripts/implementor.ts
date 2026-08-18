@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import { type AnyFunction, createEnum, createGlobalStore, type GetEnumValue, memoPromise } from "@duplojs/utils";
+import { type AnyFunction, createEnum, createGlobalStore, type GetEnumValue, memoPromise } from "@duplojs/lang";
 
 export interface ServerUtilsFunction {}
 
@@ -9,7 +9,7 @@ export type SupportedEnvironment = GetEnumValue<typeof SupportedEnvironment>;
 const SymbolEnvironmentStore = Symbol("environmentStore");
 type SymbolEnvironmentStore = typeof SymbolEnvironmentStore;
 
-declare module "@duplojs/utils" {
+declare module "@duplojs/lang" {
 	interface GlobalStore {
 		[SymbolEnvironmentStore]: SupportedEnvironment;
 	}

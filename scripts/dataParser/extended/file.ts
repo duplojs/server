@@ -1,5 +1,5 @@
-import { type AnyTuple, detachObjectMethod, type FixDeepFunctionInfer, type NeverCoalescing } from "@duplojs/utils";
-import * as DDataParser from "@duplojs/utils/dataParser";
+import { type AnyTuple, detachObjectMethod, type FixDeepFunctionInfer, type NeverCoalescing } from "@duplojs/lang";
+import * as DDataParser from "@duplojs/lang/dataParser";
 import * as dataParsers from "../parsers";
 
 export class DataParserFileExtended<

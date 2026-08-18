@@ -1,4 +1,4 @@
-import { A, DP, E, O, pipe, unwrap } from "@duplojs/utils";
+import { A, DP, E, O, pipe, unwrap } from "@duplojs/lang";
 import { implementFunction } from "@scripts/implementor";
 import type * as SF from "@scripts/file";
 import { parseEnvironmentFiles } from "./parseEnvironmentFiles";

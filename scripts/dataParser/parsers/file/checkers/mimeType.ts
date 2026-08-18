@@ -1,5 +1,5 @@
-import { type AnyTuple, detachObjectMethod, toRegExp } from "@duplojs/utils";
-import * as DDataParser from "@duplojs/utils/dataParser";
+import { type AnyTuple, detachObjectMethod, toRegExp } from "@duplojs/lang";
+import * as DDataParser from "@duplojs/lang/dataParser";
 import type * as DServerFile from "@scripts/file";
 import { createDataParserKind } from "@scripts/dataParser/kind";
 

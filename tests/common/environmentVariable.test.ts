@@ -1,4 +1,4 @@
-import { type ExpectType, DP, E, pipe, unwrap } from "@duplojs/utils";
+import { type ExpectType, DP, E, pipe, unwrap } from "@duplojs/lang";
 import { setEnvironment } from "@scripts";
 import { environmentVariable } from "@scripts/common";
 import { setDenoMock } from "tests/_utils/deno.mock";

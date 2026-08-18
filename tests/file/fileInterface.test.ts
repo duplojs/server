@@ -1,4 +1,4 @@
-import { E, type ExpectType, unwrap } from "@duplojs/utils";
+import { E, type ExpectType, unwrap } from "@duplojs/lang";
 import { DServerFile, setEnvironment } from "@scripts";
 import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
 

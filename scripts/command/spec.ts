@@ -1,8 +1,8 @@
-import * as DDP from "@duplojs/utils/dataParser";
-import * as CC from "@duplojs/utils/clean";
+import * as DDP from "@duplojs/lang/dataParser";
+import * as CC from "@duplojs/lang/clean";
 import * as SDP from "@scripts/dataParser";
 import type { EligibleCleanType, EligibleSpec } from "./types";
-import { type ExpectType, hasSomeKinds } from "@duplojs/utils";
+import { type ExpectType, hasSomeKinds } from "@duplojs/lang";
 
 export function specToDataParser(value: EligibleSpec): DDP.DataParser {
 	if (

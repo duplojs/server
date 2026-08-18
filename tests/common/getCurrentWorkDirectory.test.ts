@@ -1,4 +1,4 @@
-import { E, unwrap } from "@duplojs/utils";
+import { E, unwrap } from "@duplojs/lang";
 import { setEnvironment, getCurrentWorkDirectory, getCurrentWorkDirectoryOrThrow } from "@scripts";
 import { setDenoMock } from "tests/_utils/deno.mock";
 import { setProcessMock } from "tests/_utils/process.mock";

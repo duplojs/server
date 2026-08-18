@@ -1,4 +1,4 @@
-import { type ExpectType, pipe } from "@duplojs/utils";
+import { type ExpectType, pipe } from "@duplojs/lang";
 import { DServerCommand } from "@scripts";
 import { createError, SymbolCommandError } from "@scripts/command/error";
 

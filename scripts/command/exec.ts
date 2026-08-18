@@ -1,4 +1,4 @@
-import type { AnyFunction, AnyTuple, MaybePromise } from "@duplojs/utils";
+import type { AnyFunction, AnyTuple, MaybePromise } from "@duplojs/lang";
 import { exitProcess, getProcessArguments } from "@scripts/common";
 import { type CreateCommandExecuteParams, type CreateCommandParams, type Subjects, create } from "./create";
 import { createError, interpretCommandError, SymbolCommandError } from "./error";

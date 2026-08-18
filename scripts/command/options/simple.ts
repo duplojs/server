@@ -1,6 +1,6 @@
-import { type Kind, type RemoveKind, unwrap } from "@duplojs/utils";
-import * as EE from "@duplojs/utils/either";
-import type * as DDP from "@duplojs/utils/dataParser";
+import { type Kind, type RemoveKind, unwrap } from "@duplojs/lang";
+import * as EE from "@duplojs/lang/either";
+import type * as DDP from "@duplojs/lang/dataParser";
 import { initOption, type Option } from "./base";
 import type { EligibleSpec } from "../types";
 import type { ComputeOptionSpec } from "./types";

@@ -1,4 +1,4 @@
-import { type ExpectType, pipe } from "@duplojs/utils";
+import { type ExpectType, pipe } from "@duplojs/lang";
 import { setCurrentWorkingDirectoryOrThrow, SetCurrentWorkingDirectoryError, setEnvironment } from "@scripts";
 import { setDenoMock } from "tests/_utils/deno.mock";
 import { setProcessMock } from "tests/_utils/process.mock";

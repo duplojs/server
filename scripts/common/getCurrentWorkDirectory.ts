@@ -1,5 +1,5 @@
-import { pipe } from "@duplojs/utils";
-import * as EE from "@duplojs/utils/either";
+import { pipe } from "@duplojs/lang";
+import * as EE from "@duplojs/lang/either";
 import { implementFunction } from "@scripts/implementor";
 
 declare module "@scripts/implementor" {

@@ -1,6 +1,6 @@
 
-import type { FixDeepFunctionInfer, NeverCoalescing } from "@duplojs/utils";
-import type * as DDataParser from "@duplojs/utils/dataParser";
+import type { FixDeepFunctionInfer, NeverCoalescing } from "@duplojs/lang";
+import type * as DDataParser from "@duplojs/lang/dataParser";
 import type * as dataParsers from "../../parsers";
 import * as dataParsersExtended from "..";
 

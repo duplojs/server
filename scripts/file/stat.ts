@@ -1,6 +1,6 @@
-import { innerPipe } from "@duplojs/utils";
-import * as EE from "@duplojs/utils/either";
-import * as DD from "@duplojs/utils/date";
+import { innerPipe } from "@duplojs/lang";
+import * as EE from "@duplojs/lang/either";
+import * as DD from "@duplojs/lang/date";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { Stats } from "node:fs";
 import type { FileSystemLeft } from "./types";

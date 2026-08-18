@@ -1,5 +1,5 @@
-import { asyncPipe, type Kind, mimeType, Path, innerPipe } from "@duplojs/utils";
-import * as EE from "@duplojs/utils/either";
+import { asyncPipe, type Kind, mimeType, Path, innerPipe } from "@duplojs/lang";
+import * as EE from "@duplojs/lang/either";
 import { createDuplojsServerUtilsKind } from "@scripts/kind";
 import { rename } from "./rename";
 import { exists } from "./exists";

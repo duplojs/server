@@ -1,4 +1,4 @@
-import { type DP, E, type ExpectType, pipe, unwrap } from "@duplojs/utils";
+import { type DP, E, type ExpectType, pipe, unwrap } from "@duplojs/lang";
 import { DServerDataParser, DServerFile, TESTImplementation, setEnvironment } from "@scripts";
 import type { FileInterface } from "@scripts/file";
 

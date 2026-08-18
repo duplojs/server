@@ -1,5 +1,5 @@
-import { Printer } from "@duplojs/utils";
-import type * as DDP from "@duplojs/utils/dataParser";
+import { Printer } from "@duplojs/lang";
+import type * as DDP from "@duplojs/lang/dataParser";
 
 export interface CommandErrorIssue {
 	readonly type: "argument" | "command" | "option";

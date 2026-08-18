@@ -1,4 +1,4 @@
-import type { ComputedTypeError } from "@duplojs/utils";
+import type { ComputedTypeError } from "@duplojs/lang";
 
 export type ForbiddenDuplicateName<
 	GenericItems extends readonly { readonly name: string }[],

@@ -1,5 +1,5 @@
-import { kindHeritage } from "@duplojs/utils";
-import * as EE from "@duplojs/utils/either";
+import { kindHeritage } from "@duplojs/lang";
+import * as EE from "@duplojs/lang/either";
 import { createDuplojsServerUtilsKind } from "@scripts/kind";
 import { setCurrentWorkingDirectory } from "./setCurrentWorkingDirectory";
 

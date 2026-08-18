@@ -1,6 +1,6 @@
-import { instanceOf, pipe, when } from "@duplojs/utils";
-import * as EE from "@duplojs/utils/either";
-import * as PP from "@duplojs/utils/pattern";
+import { instanceOf, pipe, when } from "@duplojs/lang";
+import * as EE from "@duplojs/lang/either";
+import * as PP from "@duplojs/lang/pattern";
 import { implementFunction } from "@scripts/implementor";
 
 declare module "@scripts/implementor" {

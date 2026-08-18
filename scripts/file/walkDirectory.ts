@@ -1,7 +1,7 @@
-import { innerPipe } from "@duplojs/utils";
-import * as GG from "@duplojs/utils/generator";
-import * as EE from "@duplojs/utils/either";
-import * as PP from "@duplojs/utils/pattern";
+import { innerPipe } from "@duplojs/lang";
+import * as GG from "@duplojs/lang/generator";
+import * as EE from "@duplojs/lang/either";
+import * as PP from "@duplojs/lang/pattern";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import { type FileInterface, createFileInterface } from "./fileInterface";
 import { type FolderInterface, createFolderInterface } from "./folderInterface";

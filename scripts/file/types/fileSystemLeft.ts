@@ -1,4 +1,4 @@
-import type * as EE from "@duplojs/utils/either";
+import type * as EE from "@duplojs/lang/either";
 
 export type FileSystemLeft<
 	GenericName extends string,

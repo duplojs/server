@@ -1,5 +1,5 @@
-import { type FixDeepFunctionInfer, type NeverCoalescing } from "@duplojs/utils";
-import type * as DDataParser from "@duplojs/utils/dataParser";
+import { type FixDeepFunctionInfer, type NeverCoalescing } from "@duplojs/lang";
+import type * as DDataParser from "@duplojs/lang/dataParser";
 import * as dataParsers from "..";
 
 export function file<

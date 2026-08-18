@@ -1,6 +1,6 @@
-import type { RemoveKind, Kind, MaybePromise } from "@duplojs/utils";
-import * as AA from "@duplojs/utils/array";
-import * as SS from "@duplojs/utils/string";
+import type { RemoveKind, Kind, MaybePromise } from "@duplojs/lang";
+import * as AA from "@duplojs/lang/array";
+import * as SS from "@duplojs/lang/string";
 import { createDuplojsServerUtilsKind } from "@scripts/kind";
 import { addIssue, type CommandError, SymbolCommandError } from "../error";
 

@@ -1,6 +1,6 @@
-import * as GG from "@duplojs/utils/generator";
-import * as OO from "@duplojs/utils/object";
-import * as SS from "@duplojs/utils/string";
+import * as GG from "@duplojs/lang/generator";
+import * as OO from "@duplojs/lang/object";
+import * as SS from "@duplojs/lang/string";
 
 const envVarRegex = /(?<!\\)\${(?<value>[^{}]+)}/g;
 const escapedDollarRegex = /\\\$/g;

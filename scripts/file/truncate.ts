@@ -1,5 +1,5 @@
-import { instanceOf, pipe, when } from "@duplojs/utils";
-import * as EE from "@duplojs/utils/either";
+import { instanceOf, pipe, when } from "@duplojs/lang";
+import * as EE from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 

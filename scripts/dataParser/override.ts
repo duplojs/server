@@ -1,9 +1,9 @@
-import type { IsExtends } from "@duplojs/utils";
+import type { IsExtends } from "@duplojs/lang";
 import type * as DServerFile from "@scripts/file";
 import type * as AllServerDataParser from "./parsers";
 import type * as AllServerDataParserExtended from "./extended/file";
 
-declare module "@duplojs/utils/dataParser" {
+declare module "@duplojs/lang/dataParser" {
 	interface DataParserCustom {
 		file: AllServerDataParser.DataParserFile;
 	}

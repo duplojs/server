@@ -1,5 +1,5 @@
-import type { SimplifyTopLevel } from "@duplojs/utils";
-import type * as DDP from "@duplojs/utils/dataParser";
+import type { SimplifyTopLevel } from "@duplojs/lang";
+import type * as DDP from "@duplojs/lang/dataParser";
 import type * as SDP from "@scripts/dataParser";
 
 export type EligibleDataParser = (
