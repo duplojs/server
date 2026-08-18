@@ -1,16 +1,13 @@
 import { implementFunction } from "@scripts/implementor";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		getProcessArguments(): string[];
 	}
 }
 
 let args: string[] | undefined = undefined;
 
-/**
- * {@include common/getProcessArguments/index.md}
- */
 export const getProcessArguments = implementFunction(
 	"getProcessArguments",
 	{

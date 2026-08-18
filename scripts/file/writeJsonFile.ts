@@ -8,7 +8,7 @@ interface WriteJsonFile {
 }
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		writeJsonFile(
 			path: string,
 			data: unknown,
@@ -17,9 +17,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/writeJsonFile/index.md}
- */
 export const writeJsonFile = implementFunction(
 	"writeJsonFile",
 	{

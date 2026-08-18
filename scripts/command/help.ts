@@ -2,7 +2,7 @@ import { justReturn, pipe, Printer } from "@duplojs/lang";
 import * as AA from "@duplojs/lang/array";
 import * as PP from "@duplojs/lang/pattern";
 import * as DDP from "@duplojs/lang/dataParser";
-import * as SDP from "@scripts/dataParser";
+import * as SDP from "@scripts/dataStructure";
 import type { Command } from "./create";
 import type { Argument } from "./argument";
 import { arrayOptionKind, createBooleanOption, simpleOptionKind, type Options } from "./options";

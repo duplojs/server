@@ -3,15 +3,12 @@ import * as EE from "@duplojs/lang/either";
 import { implementFunction } from "@scripts/implementor";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		getCurrentWorkDirectory(): EE.Error<unknown> | EE.Success<string>;
 		getCurrentWorkDirectoryOrThrow(): string;
 	}
 }
 
-/**
- * {@include common/getCurrentWorkDirectory/index.md}
- */
 export const getCurrentWorkDirectory = implementFunction(
 	"getCurrentWorkDirectory",
 	{

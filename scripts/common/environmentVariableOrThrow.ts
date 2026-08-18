@@ -1,13 +1,13 @@
 import { kindHeritage, unwrap } from "@duplojs/lang";
 import * as EE from "@duplojs/lang/either";
 import type * as DDP from "@duplojs/lang/dataParser";
-import { createDuplojsServerUtilsKind } from "@scripts/kind";
+import { createKind } from "@scripts/kind";
 import type * as SF from "@scripts/file";
 import { type EnvironmentVariableFileParams, environmentVariable } from "./environmentVariable";
 
 export class EnvironmentVariableError extends kindHeritage(
 	"environment-variable-error",
-	createDuplojsServerUtilsKind("environment-variable-error"),
+	createKind("environment-variable-error"),
 	Error,
 ) {
 	public constructor(
@@ -17,9 +17,6 @@ export class EnvironmentVariableError extends kindHeritage(
 	}
 }
 
-/**
- * {@include common/environmentVariableOrThrow/index.md}
- */
 export async function environmentVariableOrThrow<
 	GenericShape extends DDP.DataParserObjectShape,
 >(

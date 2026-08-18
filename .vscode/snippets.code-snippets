@@ -1,0 +1,37 @@
+{
+	"test-ut": {
+		"prefix": "ut",
+		"scope": "typescript",
+		"body": [
+			"describe(\"$1\", () => {",
+			"\tit(\"$2\", () => {",
+			"\t\t$3",
+			"\t});",
+			"});"
+		],
+		"description": "template ut",
+	},
+	"test-ut-it": {
+		"prefix": "utit",
+		"scope": "typescript",
+		"body": [
+			"it(\"$1\", () => {",
+			"\t$2",
+			"});",
+		],
+		"description": "template ut",
+	},
+
+	"expect-type": {
+		"prefix": "utet",
+		"scope": "typescript",
+		"body": [
+			"type check = ExpectType<",
+			"\ttypeof $1,",
+			"\t$2,",
+			"\t\"strict\"",
+			">;",
+		],
+		"description": "template ut",
+	},
+}

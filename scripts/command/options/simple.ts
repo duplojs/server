@@ -6,9 +6,9 @@ import type { EligibleSpec } from "../types";
 import type { ComputeOptionSpec } from "./types";
 import { addIssue, addIssueDataParser } from "../error";
 import { specToDataParser } from "../spec";
-import { createDuplojsServerUtilsKind } from "@scripts/kind";
+import { createKind } from "@scripts/kind";
 
-export const simpleOptionKind = createDuplojsServerUtilsKind("command-simple-option");
+export const simpleOptionKind = createKind("command-simple-option");
 
 type _SimpleOption<
 	GenericName extends string = string,
@@ -30,9 +30,6 @@ export interface SimpleOption<
 	readonly required: boolean;
 }
 
-/**
- * {@include command/createOption/index.md}
- */
 export function createOption<
 	GenericName extends string,
 	GenericSpec extends EligibleSpec,

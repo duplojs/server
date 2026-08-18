@@ -1,6 +1,3 @@
-/**
- * {@include file/index.md}
- */
 export * from "./types";
 
 export * from "./readFile";

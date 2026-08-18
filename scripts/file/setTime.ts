@@ -9,7 +9,7 @@ interface SetTimeParams {
 }
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		setTime(
 			path: string,
 			params: SetTimeParams
@@ -17,9 +17,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/setTime/index.md}
- */
 export const setTime = implementFunction(
 	"setTime",
 	{

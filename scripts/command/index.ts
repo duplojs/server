@@ -1,6 +1,3 @@
-/**
- * {@include command/index.md}
- */
 export * from "./types";
 
 export * from "./argument";

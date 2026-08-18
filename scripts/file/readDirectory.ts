@@ -7,7 +7,7 @@ interface ReadDirectoryParams {
 }
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		readDirectory<
 			GenericPath extends string,
 		>(
@@ -17,9 +17,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/readDirectory/index.md}
- */
 export const readDirectory = implementFunction(
 	"readDirectory",
 	{

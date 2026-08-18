@@ -13,7 +13,7 @@ export interface SymlinkParams {
 }
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		symlink(
 			oldPath: string,
 			newPath: string,
@@ -22,9 +22,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/symlink/index.md}
- */
 export const symlink = implementFunction(
 	"symlink",
 	{

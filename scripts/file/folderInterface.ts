@@ -1,6 +1,6 @@
 import { asyncPipe, innerPipe, Path, type Kind } from "@duplojs/lang";
 import * as EE from "@duplojs/lang/either";
-import { createDuplojsServerUtilsKind } from "@scripts/kind";
+import { createKind } from "@scripts/kind";
 import { move } from "./move";
 import { exists } from "./exists";
 import { rename } from "./rename";
@@ -13,7 +13,7 @@ import type { UnknownInterface } from "./unknownInterface";
 import type { FileSystemLeft } from "./types";
 import { relocate } from "./relocate";
 
-const folderInterfaceKind = createDuplojsServerUtilsKind("folderInterface");
+const folderInterfaceKind = createKind("folderInterface");
 
 export interface FolderInterface extends Kind<
 	typeof folderInterfaceKind.definition
@@ -31,9 +31,6 @@ export interface FolderInterface extends Kind<
 	walk(): Promise<FileSystemLeft<"walk-directory"> | EE.Success<Generator<FolderInterface | FileInterface | UnknownInterface>>>;
 }
 
-/**
- * {@include file/createFolderInterface/index.md}
- */
 export function createFolderInterface(path: string): FolderInterface {
 	function getName() {
 		return Path.getBaseName(path);
@@ -113,9 +110,6 @@ export function createFolderInterface(path: string): FolderInterface {
 	});
 }
 
-/**
- * {@include file/isFolderInterface/index.md}
- */
 export function isFolderInterface(
 	input: unknown,
 ): input is FolderInterface {

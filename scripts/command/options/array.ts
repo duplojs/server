@@ -8,11 +8,11 @@ import type { EligibleSpec } from "../types";
 import type { ComputeOptionSpec } from "./types";
 import { addIssue, addIssueDataParser } from "../error";
 import { specToDataParser } from "../spec";
-import { createDuplojsServerUtilsKind } from "@scripts/kind";
+import { createKind } from "@scripts/kind";
 
 const defaultSeparator = ",";
 
-export const arrayOptionKind = createDuplojsServerUtilsKind("command-array-option");
+export const arrayOptionKind = createKind("command-array-option");
 
 type _ArrayOption<
 	GenericName extends string = string,
@@ -37,9 +37,6 @@ export interface ArrayOption<
 	readonly max?: number;
 }
 
-/**
- * {@include command/createArrayOption/index.md}
- */
 export function createArrayOption<
 	GenericName extends string,
 	GenericSpec extends EligibleSpec,

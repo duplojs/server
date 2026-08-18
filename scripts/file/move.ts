@@ -3,7 +3,7 @@ import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		move(
 			fromPath: string,
 			toPath: string,
@@ -11,9 +11,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/move/index.md}
- */
 export const move = implementFunction(
 	"move",
 	{

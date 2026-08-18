@@ -1,6 +1,3 @@
-/**
- * {@include common/index.md}
- */
 export * from "./getCurrentWorkDirectory";
 export * from "./getCurrentWorkDirectoryOrThrow";
 export * from "./setCurrentWorkingDirectory";

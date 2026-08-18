@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import { type AnyFunction, createEnum, createGlobalStore, type GetEnumValue, memoPromise } from "@duplojs/lang";
 
-export interface ServerUtilsFunction {}
+export interface ServerFunction {}
 
 export const SupportedEnvironment = createEnum(["BUN", "DENO", "NODE", "TEST"]);
 export type SupportedEnvironment = GetEnumValue<typeof SupportedEnvironment>;
@@ -32,9 +32,6 @@ const environmentStoreHandler = createGlobalStore(
 	})(),
 );
 
-/**
- * {@include setEnvironment.md}
- */
 export function setEnvironment(environment: SupportedEnvironment) {
 	environmentStoreHandler.set(environment);
 }
@@ -47,35 +44,35 @@ export namespace TESTImplementation {
 	}
 
 	export function set<
-		GenericFunctionName extends keyof ServerUtilsFunction,
+		GenericFunctionName extends keyof ServerFunction,
 	>(
 		functionName: GenericFunctionName,
-		theFunction: ServerUtilsFunction[GenericFunctionName],
-	): ServerUtilsFunction[GenericFunctionName] {
+		theFunction: ServerFunction[GenericFunctionName],
+	): ServerFunction[GenericFunctionName] {
 		store.set(functionName, theFunction);
 
 		return theFunction;
 	}
 
 	export function get<
-		GenericFunctionName extends keyof ServerUtilsFunction,
+		GenericFunctionName extends keyof ServerFunction,
 	>(
 		functionName: GenericFunctionName,
-	): ServerUtilsFunction[GenericFunctionName] | undefined {
+	): ServerFunction[GenericFunctionName] | undefined {
 		return store.get(functionName);
 	}
 }
 
 export function implementFunction<
-	GenericFunctionName extends keyof ServerUtilsFunction,
+	GenericFunctionName extends keyof ServerFunction,
 >(
 	functionName: GenericFunctionName,
 	theFunctions: {
-		NODE: ServerUtilsFunction[GenericFunctionName];
-		BUN?: ServerUtilsFunction[GenericFunctionName];
-		DENO?: ServerUtilsFunction[GenericFunctionName];
+		NODE: ServerFunction[GenericFunctionName];
+		BUN?: ServerFunction[GenericFunctionName];
+		DENO?: ServerFunction[GenericFunctionName];
 	},
-): ServerUtilsFunction[GenericFunctionName] {
+): ServerFunction[GenericFunctionName] {
 	const environmentFunctions: Record<
 		SupportedEnvironment,
 		AnyFunction

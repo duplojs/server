@@ -1,11 +1,11 @@
 import { Path, type Kind } from "@duplojs/lang";
 import type * as EE from "@duplojs/lang/either";
-import { createDuplojsServerUtilsKind } from "@scripts/kind";
+import { createKind } from "@scripts/kind";
 import { stat, type StatInfo } from "./stat";
 import { exists } from "./exists";
 import type { FileSystemLeft } from "./types";
 
-const unknownInterfaceKind = createDuplojsServerUtilsKind("unknownInterface");
+const unknownInterfaceKind = createKind("unknownInterface");
 
 export interface UnknownInterface extends Kind<
 	typeof unknownInterfaceKind.definition
@@ -17,9 +17,6 @@ export interface UnknownInterface extends Kind<
 	exist(): Promise<FileSystemLeft<"exists"> | EE.Ok>;
 }
 
-/**
- * {@include file/createUnknownInterface/index.md}
- */
 export function createUnknownInterface(path: string): UnknownInterface {
 	function getName() {
 		return Path.getBaseName(path);
@@ -46,9 +43,6 @@ export function createUnknownInterface(path: string): UnknownInterface {
 	});
 }
 
-/**
- * {@include file/isUnknownInterface/index.md}
- */
 export function isUnknownInterface(
 	input: unknown,
 ): input is UnknownInterface {

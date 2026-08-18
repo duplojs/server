@@ -13,7 +13,7 @@ interface WalkDirectoryParams {
 }
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		walkDirectory<
 			GenericPath extends string,
 		>(
@@ -28,9 +28,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/walkDirectory/index.md}
- */
 export const walkDirectory = implementFunction(
 	"walkDirectory",
 	{

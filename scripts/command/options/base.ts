@@ -1,10 +1,10 @@
 import type { RemoveKind, Kind, MaybePromise } from "@duplojs/lang";
 import * as AA from "@duplojs/lang/array";
 import * as SS from "@duplojs/lang/string";
-import { createDuplojsServerUtilsKind } from "@scripts/kind";
+import { createKind } from "@scripts/kind";
 import { addIssue, type CommandError, SymbolCommandError } from "../error";
 
-export const optionKind = createDuplojsServerUtilsKind("command-option");
+export const optionKind = createKind("command-option");
 const regexOption = /^(?<dashes>-{1,2})(?<key>[A-Za-z0-9][A-Za-z0-9_-]*)(?:=(?<value>.*))?$/;
 
 export interface Option<

@@ -3,7 +3,7 @@ import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		writeFile(
 			path: string,
 			data: Uint8Array,
@@ -11,9 +11,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/writeFile/index.md}
- */
 export const writeFile = implementFunction(
 	"writeFile",
 	{

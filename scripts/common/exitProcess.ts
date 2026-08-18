@@ -1,14 +1,11 @@
 import { implementFunction } from "@scripts/implementor";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		exitProcess(code?: number): void;
 	}
 }
 
-/**
- * {@include common/exitProcess/index.md}
- */
 export const exitProcess = implementFunction(
 	"exitProcess",
 	{

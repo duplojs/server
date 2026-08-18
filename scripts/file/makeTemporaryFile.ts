@@ -4,14 +4,11 @@ import { implementFunction, nodeCrypto, nodeFileSystem, nodeOs } from "@scripts/
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		makeTemporaryFile(prefix: string, suffix?: string): Promise<FileSystemLeft<"make-temporary-file"> | EE.Success<string>>;
 	}
 }
 
-/**
- * {@include file/makeTemporaryFile/index.md}
- */
 export const makeTemporaryFile = implementFunction(
 	"makeTemporaryFile",
 	{

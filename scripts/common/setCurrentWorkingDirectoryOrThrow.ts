@@ -1,11 +1,11 @@
 import { kindHeritage } from "@duplojs/lang";
 import * as EE from "@duplojs/lang/either";
-import { createDuplojsServerUtilsKind } from "@scripts/kind";
+import { createKind } from "@scripts/kind";
 import { setCurrentWorkingDirectory } from "./setCurrentWorkingDirectory";
 
 export class SetCurrentWorkingDirectoryError extends kindHeritage(
 	"set-working-directory-error",
-	createDuplojsServerUtilsKind("set-working-directory-error"),
+	createKind("set-working-directory-error"),
 	Error,
 ) {
 	public constructor() {
@@ -13,9 +13,6 @@ export class SetCurrentWorkingDirectoryError extends kindHeritage(
 	}
 }
 
-/**
- * {@include common/setCurrentWorkingDirectoryOrThrow/index.md}
- */
 export function setCurrentWorkingDirectoryOrThrow<
 	GenericPath extends string,
 >(

@@ -1,12 +1,12 @@
 import { type RemoveKind, type Kind, unwrap } from "@duplojs/lang";
 import * as EE from "@duplojs/lang/either";
 import type * as DDP from "@duplojs/lang/dataParser";
-import { createDuplojsServerUtilsKind } from "@scripts/kind";
+import { createKind } from "@scripts/kind";
 import type { EligibleSpec, EligibleSpecOutput } from "./types";
 import { addIssue, addIssueDataParser, type CommandError, type SymbolCommandError } from "./error";
 import { specToDataParser } from "./spec";
 
-export const argumentKind = createDuplojsServerUtilsKind("command-argument");
+export const argumentKind = createKind("command-argument");
 
 export interface Argument<
 	GenericName extends string = string,
@@ -26,9 +26,6 @@ export interface Argument<
 	>;
 }
 
-/**
- * {@include command/createArgument/index.md}
- */
 export function createArgument<
 	GenericName extends string,
 	GenericEligibleSpec extends EligibleSpec,

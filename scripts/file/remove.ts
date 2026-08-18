@@ -7,7 +7,7 @@ interface RemoveDirectoryParams {
 }
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		remove<
 			GenericPath extends string,
 		>(
@@ -17,9 +17,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/remove/index.md}
- */
 export const remove = implementFunction(
 	"remove",
 	{

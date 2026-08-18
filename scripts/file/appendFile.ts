@@ -3,7 +3,7 @@ import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		appendFile(
 			path: string,
 			data: Uint8Array,
@@ -11,9 +11,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/appendFile/index.md}
- */
 export const appendFile = implementFunction(
 	"appendFile",
 	{

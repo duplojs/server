@@ -2,7 +2,7 @@ import { type Kind, type AnyFunction, type RemoveKind, type MaybePromise, type A
 import * as AA from "@duplojs/lang/array";
 import * as GG from "@duplojs/lang/generator";
 import * as OO from "@duplojs/lang/object";
-import { createDuplojsServerUtilsKind } from "@scripts/kind";
+import { createKind } from "@scripts/kind";
 import { exitProcess } from "@scripts/common/exitProcess";
 import type { Option } from "./options";
 import { addIssue, SymbolCommandError, type CommandError } from "./error";
@@ -10,7 +10,7 @@ import { logCommandHelp, helpOption } from "./help";
 import { type Argument } from "./argument";
 import { type ForbiddenDuplicateName } from "./types";
 
-const commandKind = createDuplojsServerUtilsKind("command");
+const commandKind = createKind("command");
 
 export function isCommands(input: unknown): input is AnyTuple<Command> {
 	return input instanceof Array
@@ -118,9 +118,6 @@ export type CreateCommandExecuteParams<
 	)
 );
 
-/**
- * {@include command/create/index.md}
- */
 export function create<
 	GenericName extends string,
 >(

@@ -4,16 +4,13 @@ import * as PP from "@duplojs/lang/pattern";
 import { implementFunction } from "@scripts/implementor";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		setCurrentWorkingDirectory<
 			GenericPath extends string,
 		>(path: GenericPath): EE.Fail | EE.Ok;
 	}
 }
 
-/**
- * {@include common/setCurrentWorkingDirectory/index.md}
- */
 export const setCurrentWorkingDirectory = implementFunction(
 	"setCurrentWorkingDirectory",
 	{

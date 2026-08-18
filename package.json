@@ -42,20 +42,10 @@
       "require": "./dist/common/index.cjs",
       "types": "./dist/common/index.d.ts"
     },
-   "./dataParser": {
-      "import": "./dist/dataParser/index.mjs",
-      "require": "./dist/dataParser/index.cjs",
-      "types": "./dist/dataParser/index.d.ts"
-    },
-    "./dataParserCoerce": {
-      "import": "./dist/dataParser/parsers/coerce/index.mjs",
-      "require": "./dist/dataParser/parsers/coerce/index.cjs",
-      "types": "./dist/dataParser/parsers/coerce/index.d.ts"
-    },
-    "./dataParserExtended": {
-      "import": "./dist/dataParser/extended/index.mjs",
-      "require": "./dist/dataParser/extended/index.cjs",
-      "types": "./dist/dataParser/extended/index.d.ts"
+   "./dataStructure": {
+      "import": "./dist/dataStructure/index.mjs",
+      "require": "./dist/dataStructure/index.cjs",
+      "types": "./dist/dataStructure/index.d.ts"
     },
     "./command": {
       "import": "./dist/command/index.mjs",

@@ -1,6 +1,6 @@
 import type { SimplifyTopLevel } from "@duplojs/lang";
 import type * as DDP from "@duplojs/lang/dataParser";
-import type * as SDP from "@scripts/dataParser";
+import type * as SDP from "@scripts/dataStructure";
 
 export type EligibleDataParser = (
 	| DDP.DataParserString

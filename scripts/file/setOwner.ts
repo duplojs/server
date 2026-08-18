@@ -8,7 +8,7 @@ interface SetOwnerParams {
 }
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		setOwner(
 			path: string,
 			params: SetOwnerParams,
@@ -16,9 +16,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/setOwner/index.md}
- */
 export const setOwner = implementFunction(
 	"setOwner",
 	{

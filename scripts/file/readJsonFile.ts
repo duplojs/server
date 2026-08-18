@@ -3,7 +3,7 @@ import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		readJsonFile<
 			GenericOutput extends unknown,
 			GenericPath extends string = string,
@@ -13,9 +13,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/readJsonFile/index.md}
- */
 export const readJsonFile = implementFunction(
 	"readJsonFile",
 	{

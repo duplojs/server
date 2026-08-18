@@ -3,14 +3,11 @@ import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		makeTemporaryDirectory(prefix: string): Promise<FileSystemLeft<"make-temporary-directory"> | EE.Success<string>>;
 	}
 }
 
-/**
- * {@include file/makeTemporaryDirectory/index.md}
- */
 export const makeTemporaryDirectory = implementFunction(
 	"makeTemporaryDirectory",
 	{

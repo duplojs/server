@@ -7,7 +7,7 @@ interface MakeDirectoryParams {
 }
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		makeDirectory<
 			GenericPath extends string,
 		>(
@@ -17,9 +17,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/makeDirectory/index.md}
- */
 export const makeDirectory = implementFunction(
 	"makeDirectory",
 	{

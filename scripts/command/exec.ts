@@ -21,9 +21,6 @@ export type ExecCommandParams<
 	}
 );
 
-/**
- * {@include command/exec/index.md}
- */
 export function exec(
 	execute: () => void,
 ): Promise<void>;

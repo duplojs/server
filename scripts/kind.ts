@@ -1,12 +1,11 @@
-import { createKindNamespace } from "@duplojs/lang";
+import * as DKind from "@duplojs/lang/kind";
 
 declare module "@duplojs/lang" {
 	interface ReservedKindNamespace {
-		DuplojsServerUtils: true;
+		DuplojsServer: true;
 	}
 }
 
-export const createDuplojsServerUtilsKind = createKindNamespace(
-	// @ts-expect-error reserved kind namespace
-	"DuplojsServerUtils",
+export const createKind = DKind.createNamespace(
+	"DuplojsServer",
 );

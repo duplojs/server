@@ -34,7 +34,7 @@ export interface EnvironmentVariableFileParams {
 export type EnvironmentVariableParams = EnvironmentVariableFileParams;
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		environmentVariable<
 			GenericShape extends DP.DataParserObjectShape,
 		>(
@@ -48,9 +48,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include common/environmentVariable/index.md}
- */
 export const environmentVariable = implementFunction(
 	"environmentVariable",
 	{

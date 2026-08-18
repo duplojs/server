@@ -3,16 +3,13 @@ import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		ensureFile<
 			GenericPath extends string,
 		>(path: GenericPath): Promise<FileSystemLeft<"ensure-file"> | EE.Ok>;
 	}
 }
 
-/**
- * {@include file/ensureFile/index.md}
- */
 export const ensureFile = implementFunction(
 	"ensureFile",
 	{

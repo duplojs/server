@@ -46,7 +46,7 @@ export interface StatInfo {
 }
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		stat<
 			GenericPath extends string,
 		>(
@@ -119,9 +119,6 @@ function createStatInfoWithDeno(source: Deno.FileInfo): StatInfo {
 	};
 }
 
-/**
- * {@include file/stat/index.md}
- */
 export const stat = implementFunction(
 	"stat",
 	{

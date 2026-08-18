@@ -48,7 +48,7 @@ function toMode(mode: SetMode): number {
 }
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		setMode(
 			path: string,
 			mode: SetMode,
@@ -56,9 +56,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/setMode/index.md}
- */
 export const setMode = implementFunction(
 	"setMode",
 	{

@@ -71,7 +71,7 @@ function createStatInfoWithDeno(source: Deno.FileInfo): StatInfo {
 }
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		linkStat<
 			GenericPath extends string,
 		>(
@@ -80,9 +80,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/linkStat/index.md}
- */
 export const linkStat = implementFunction(
 	"linkStat",
 	{

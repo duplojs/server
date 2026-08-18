@@ -3,7 +3,7 @@ import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		exists<
 			GenericPath extends string,
 		>(
@@ -12,9 +12,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/exists/index.md}
- */
 export const exists = implementFunction(
 	"exists",
 	{

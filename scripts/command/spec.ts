@@ -1,6 +1,6 @@
 import * as DDP from "@duplojs/lang/dataParser";
 import * as CC from "@duplojs/lang/clean";
-import * as SDP from "@scripts/dataParser";
+import * as SDP from "@scripts/dataStructure";
 import type { EligibleCleanType, EligibleSpec } from "./types";
 import { type ExpectType, hasSomeKinds } from "@duplojs/lang";
 

@@ -1,8 +1,8 @@
 import { type RemoveKind, type Kind } from "@duplojs/lang";
 import { initOption, type Option } from "./base";
-import { createDuplojsServerUtilsKind } from "@scripts/kind";
+import { createKind } from "@scripts/kind";
 
-export const booleanOptionKind = createDuplojsServerUtilsKind("command-boolean-option");
+export const booleanOptionKind = createKind("command-boolean-option");
 
 type _BooleanOption<
 	GenericName extends string = string,
@@ -18,9 +18,6 @@ export interface BooleanOption<
 	GenericName extends string = string,
 > extends _BooleanOption<GenericName> {}
 
-/**
- * {@include command/createBooleanOption/index.md}
- */
 export function createBooleanOption<
 	GenericName extends string,
 >(

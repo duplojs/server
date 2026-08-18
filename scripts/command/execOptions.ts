@@ -18,9 +18,6 @@ type ComputeResult<
 		: never
 }>;
 
-/**
- * {@include command/execOptions/index.md}
- */
 export function execOptions<
 	GenericOptions extends AnyTuple<Option>,
 >(

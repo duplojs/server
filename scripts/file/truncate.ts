@@ -4,7 +4,7 @@ import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		truncate<
 			GenericPath extends string,
 		>(
@@ -14,9 +14,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/truncate/index.md}
- */
 export const truncate = implementFunction(
 	"truncate",
 	{

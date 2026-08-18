@@ -1,6 +1,7 @@
-import { asyncPipe, type Kind, mimeType, Path, innerPipe } from "@duplojs/lang";
+import { asyncPipe, mimeType, Path, innerPipe } from "@duplojs/lang";
+import type * as DKind from "@duplojs/lang/kind";
 import * as EE from "@duplojs/lang/either";
-import { createDuplojsServerUtilsKind } from "@scripts/kind";
+import { createKind } from "@scripts/kind";
 import { rename } from "./rename";
 import { exists } from "./exists";
 import { move } from "./move";
@@ -9,10 +10,10 @@ import { type StatInfo, stat } from "./stat";
 import type { FileSystemLeft } from "./types";
 import { relocate } from "./relocate";
 
-const fileInterfaceKind = createDuplojsServerUtilsKind("fileInterface");
+const fileInterfaceKind = createKind("fileInterface");
 
-export interface FileInterface extends Kind<
-	typeof fileInterfaceKind.definition
+export interface FileInterface extends DKind.Kind<
+	typeof fileInterfaceKind
 > {
 	path: string;
 	getName(): string | null;
@@ -27,9 +28,6 @@ export interface FileInterface extends Kind<
 	stat(): Promise<FileSystemLeft<"stat"> | EE.Success<StatInfo>>;
 }
 
-/**
- * {@include file/createFileInterface/index.md}
- */
 export function createFileInterface(
 	path: string,
 ): FileInterface {
@@ -117,9 +115,6 @@ export function createFileInterface(
 	});
 }
 
-/**
- * {@include file/isFileInterface/index.md}
- */
 export function isFileInterface(
 	input: unknown,
 ): input is FileInterface {

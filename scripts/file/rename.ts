@@ -4,7 +4,7 @@ import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
-	interface ServerUtilsFunction {
+	interface ServerFunction {
 		rename(
 			path: string,
 			newName: string,
@@ -12,9 +12,6 @@ declare module "@scripts/implementor" {
 	}
 }
 
-/**
- * {@include file/rename/index.md}
- */
 export const rename = implementFunction(
 	"rename",
 	{
