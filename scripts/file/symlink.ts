@@ -1,4 +1,5 @@
 import * as DEither from "@duplojs/lang/either";
+import type * as DPath from "@duplojs/lang/path";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -15,8 +16,8 @@ export interface SymlinkParams {
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		symlink(
-			oldPath: string,
-			newPath: string,
+			oldPath: string & DPath.Path,
+			newPath: string & DPath.Path,
 			params?: SymlinkParams
 		): Promise<FileSystemLeft<"symlink"> | DEither.Ok>;
 	}

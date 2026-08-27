@@ -1,12 +1,13 @@
 import { instanceOf, pipe, when } from "@duplojs/lang";
 import * as DEither from "@duplojs/lang/either";
+import type * as DPath from "@duplojs/lang/path";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		truncate<
-			GenericPath extends string,
+			GenericPath extends string & DPath.Path,
 		>(
 			path: GenericPath,
 			size?: number,
@@ -23,7 +24,7 @@ export const truncate = implementFunction(
 				.then(DEither.ok)
 				.catch((value) => DEither.left("file-system-truncate", value));
 		},
-		DENO: (path: string, size) => pipe(
+		DENO: (path, size) => pipe(
 			path,
 			when(
 				instanceOf(URL),

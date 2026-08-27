@@ -1,5 +1,6 @@
 import { isType } from "@duplojs/lang";
 import * as DEither from "@duplojs/lang/either";
+import type * as DPath from "@duplojs/lang/path";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -50,7 +51,7 @@ function toMode(mode: SetMode): number {
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		setMode(
-			path: string,
+			path: string & DPath.Path,
 			mode: SetMode,
 		): Promise<FileSystemLeft<"set-mode"> | DEither.Ok>;
 	}

@@ -32,4 +32,3 @@ export const move = implementFunction(
 			.catch((value) => DEither.left("file-system-move", value)),
 	},
 );
-

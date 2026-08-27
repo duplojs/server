@@ -1,4 +1,5 @@
 import * as DEither from "@duplojs/lang/either";
+import type * as DPath from "@duplojs/lang/path";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -10,7 +11,7 @@ interface SetOwnerParams {
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		setOwner(
-			path: string,
+			path: string & DPath.Path,
 			params: SetOwnerParams,
 		): Promise<FileSystemLeft<"set-owner"> | DEither.Ok>;
 	}

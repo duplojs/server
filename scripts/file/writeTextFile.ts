@@ -1,11 +1,12 @@
 import * as DEither from "@duplojs/lang/either";
+import type * as DPath from "@duplojs/lang/path";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		writeTextFile(
-			path: string,
+			path: string & DPath.Path,
 			data: string,
 		): Promise<FileSystemLeft<"write-text-file"> | DEither.Ok>;
 	}

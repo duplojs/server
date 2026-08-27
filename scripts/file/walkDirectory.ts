@@ -1,4 +1,5 @@
-import { DPath, forwardAsserts, innerPipe } from "@duplojs/lang";
+import { forwardAsserts, innerPipe } from "@duplojs/lang";
+import * as DPath from "@duplojs/lang/path";
 import * as GG from "@duplojs/lang/generator";
 import * as DEither from "@duplojs/lang/either";
 import * as PP from "@duplojs/lang/pattern";
@@ -71,4 +72,3 @@ export const walkDirectory = implementFunction(
 		},
 	},
 );
-

@@ -1,11 +1,12 @@
 import * as DEither from "@duplojs/lang/either";
+import type * as DPath from "@duplojs/lang/path";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		readFile<
-			GenericPath extends string,
+			GenericPath extends string & DPath.Path,
 		>(
 			path: GenericPath
 		): Promise<FileSystemLeft<"read-file"> | DEither.Success<Uint8Array>>;

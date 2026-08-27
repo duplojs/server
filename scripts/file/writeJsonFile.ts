@@ -1,5 +1,6 @@
 import { pipe } from "@duplojs/lang";
 import * as DEither from "@duplojs/lang/either";
+import type * as DPath from "@duplojs/lang/path";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -10,7 +11,7 @@ interface WriteJsonFile {
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		writeJsonFile(
-			path: string,
+			path: string & DPath.Path,
 			data: unknown,
 			params?: WriteJsonFile
 		): Promise<FileSystemLeft<"write-json-file"> | DEither.Ok>;
