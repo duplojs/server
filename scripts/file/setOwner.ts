@@ -1,4 +1,4 @@
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -12,7 +12,7 @@ declare module "@scripts/implementor" {
 		setOwner(
 			path: string,
 			params: SetOwnerParams,
-		): Promise<FileSystemLeft<"set-owner"> | EE.Ok>;
+		): Promise<FileSystemLeft<"set-owner"> | DEither.Ok>;
 	}
 }
 
@@ -22,12 +22,12 @@ export const setOwner = implementFunction(
 		NODE: async(path, { userId, groupId }) => {
 			const fs = await nodeFileSystem.value;
 			return fs.chown(path, userId, groupId)
-				.then(EE.ok)
-				.catch((value) => EE.left("file-system-set-owner", value));
+				.then(DEither.ok)
+				.catch((value) => DEither.left("file-system-set-owner", value));
 		},
 		DENO: (path, { userId, groupId }) => Deno
 			.chown(path, userId, groupId)
-			.then(EE.ok)
-			.catch((value) => EE.left("file-system-set-owner", value)),
+			.then(DEither.ok)
+			.catch((value) => DEither.left("file-system-set-owner", value)),
 	},
 );

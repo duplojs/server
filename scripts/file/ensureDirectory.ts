@@ -1,4 +1,4 @@
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -8,7 +8,7 @@ declare module "@scripts/implementor" {
 			GenericPath extends string,
 		>(
 			path: GenericPath,
-		): Promise<FileSystemLeft<"ensure-directory"> | EE.Ok>;
+		): Promise<FileSystemLeft<"ensure-directory"> | DEither.Ok>;
 	}
 }
 
@@ -23,8 +23,8 @@ export const ensureDirectory = implementFunction(
 					recursive: true,
 				},
 			)
-				.then(EE.ok)
-				.catch((value) => EE.left("file-system-ensure-directory", value));
+				.then(DEither.ok)
+				.catch((value) => DEither.left("file-system-ensure-directory", value));
 		},
 		DENO: (path) => Deno.mkdir(
 			path,
@@ -32,7 +32,7 @@ export const ensureDirectory = implementFunction(
 				recursive: true,
 			},
 		)
-			.then(EE.ok)
-			.catch((value) => EE.left("file-system-ensure-directory", value)),
+			.then(DEither.ok)
+			.catch((value) => DEither.left("file-system-ensure-directory", value)),
 	},
 );

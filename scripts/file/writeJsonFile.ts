@@ -1,5 +1,5 @@
 import { pipe } from "@duplojs/lang";
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -13,7 +13,7 @@ declare module "@scripts/implementor" {
 			path: string,
 			data: unknown,
 			params?: WriteJsonFile
-		): Promise<FileSystemLeft<"write-json-file"> | EE.Ok>;
+		): Promise<FileSystemLeft<"write-json-file"> | DEither.Ok>;
 	}
 }
 
@@ -23,59 +23,59 @@ export const writeJsonFile = implementFunction(
 		NODE: async(path, data, params) => {
 			const fs = await nodeFileSystem.value;
 			return pipe(
-				EE.safeCallback(
+				DEither.safeCallback(
 					() => JSON.stringify(
 						data,
 						null,
 						params?.space,
 					),
 				),
-				EE.matchInformation({
-					"safe-callback-error": (value) => EE.left("file-system-write-json-file", value),
+				DEither.matchInformation({
+					"safe-callback-error": (value) => DEither.left("file-system-write-json-file", value),
 					"safe-callback-success": (value) => fs
 						.writeFile(
 							path,
 							value,
 							{ encoding: "utf-8" },
 						)
-						.then(EE.ok)
-						.catch((value) => EE.left("file-system-write-json-file", value)),
+						.then(DEither.ok)
+						.catch((value) => DEither.left("file-system-write-json-file", value)),
 				}),
 			);
 		},
 		DENO: async(path, data, params) => pipe(
-			EE.safeCallback(
+			DEither.safeCallback(
 				() => JSON.stringify(
 					data,
 					null,
 					params?.space,
 				),
 			),
-			EE.matchInformation({
-				"safe-callback-error": (value) => EE.left("file-system-write-json-file", value),
+			DEither.matchInformation({
+				"safe-callback-error": (value) => DEither.left("file-system-write-json-file", value),
 				"safe-callback-success": (value) => Deno
 					.writeTextFile(
 						path,
 						value,
 					)
-					.then(EE.ok)
-					.catch((value) => EE.left("file-system-write-json-file", value)),
+					.then(DEither.ok)
+					.catch((value) => DEither.left("file-system-write-json-file", value)),
 			}),
 		),
 		BUN: async(path, data, params) => pipe(
-			EE.safeCallback(
+			DEither.safeCallback(
 				() => JSON.stringify(
 					data,
 					null,
 					params?.space,
 				),
 			),
-			EE.matchInformation({
-				"safe-callback-error": (value) => EE.left("file-system-write-json-file", value),
+			DEither.matchInformation({
+				"safe-callback-error": (value) => DEither.left("file-system-write-json-file", value),
 				"safe-callback-success": (value) => Bun.file(path)
 					.write(value)
-					.then(EE.ok)
-					.catch((value) => EE.left("file-system-write-json-file", value)),
+					.then(DEither.ok)
+					.catch((value) => DEither.left("file-system-write-json-file", value)),
 			}),
 		),
 	},

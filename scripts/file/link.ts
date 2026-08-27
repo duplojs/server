@@ -1,4 +1,4 @@
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -7,7 +7,7 @@ declare module "@scripts/implementor" {
 		link(
 			existingPath: string,
 			newPath: string,
-		): Promise<FileSystemLeft<"link"> | EE.Ok>;
+		): Promise<FileSystemLeft<"link"> | DEither.Ok>;
 	}
 }
 
@@ -20,15 +20,15 @@ export const link = implementFunction(
 				existingPath,
 				newPath,
 			)
-				.then(EE.ok)
-				.catch((value) => EE.left("file-system-link", value));
+				.then(DEither.ok)
+				.catch((value) => DEither.left("file-system-link", value));
 		},
 		DENO: (existingPath, newPath) => Deno
 			.link(
 				existingPath,
 				newPath,
 			)
-			.then(EE.ok)
-			.catch((value) => EE.left("file-system-link", value)),
+			.then(DEither.ok)
+			.catch((value) => DEither.left("file-system-link", value)),
 	},
 );

@@ -1,6 +1,6 @@
-import { innerPipe } from "@duplojs/lang";
+import { DPath, forwardAsserts, innerPipe } from "@duplojs/lang";
 import * as GG from "@duplojs/lang/generator";
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import * as PP from "@duplojs/lang/pattern";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import { type FileInterface, createFileInterface } from "./fileInterface";
@@ -15,13 +15,13 @@ interface WalkDirectoryParams {
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		walkDirectory<
-			GenericPath extends string,
+			GenericPath extends string & DPath.Path,
 		>(
 			path: GenericPath,
 			params?: WalkDirectoryParams,
 		): Promise<
 			FileSystemLeft<"walk-directory">
-			| EE.Success<
+			| DEither.Success<
 				Generator<FileInterface | FolderInterface | UnknownInterface>
 			>
 		>;
@@ -48,26 +48,26 @@ export const walkDirectory = implementFunction(
 								PP.when(
 									(dirent) => dirent.isFile(),
 									({ parentPath, name }) => createFileInterface(
-										`${parentPath}/${name}`,
+										forwardAsserts(`${parentPath}/${name}`, DPath.is),
 									),
 								),
 								PP.when(
 									(dirent) => dirent.isDirectory(),
 									({ parentPath, name }) => createFolderInterface(
-										`${parentPath}/${name}`,
+										forwardAsserts(`${parentPath}/${name}`, DPath.is),
 									),
 								),
 								PP.otherwise(
 									({ parentPath, name }) => createUnknownInterface(
-										`${parentPath}/${name}`,
+										forwardAsserts(`${parentPath}/${name}`, DPath.is),
 									),
 								),
 							),
 						),
-						EE.success,
+						DEither.success,
 					),
 				)
-				.catch((value) => EE.left("file-system-walk-directory", value));
+				.catch((value) => DEither.left("file-system-walk-directory", value));
 		},
 	},
 );

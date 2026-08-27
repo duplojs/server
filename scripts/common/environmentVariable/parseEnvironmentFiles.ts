@@ -1,7 +1,7 @@
 import { innerPipe, pipe, when } from "@duplojs/lang";
 import * as GG from "@duplojs/lang/generator";
 import * as SS from "@duplojs/lang/string";
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import * as SF from "@scripts/file";
 
 const lineRegex = /^(?:export\s+)?(?<key>[A-Z_][A-Z0-9_]*)=(?<value>'(?:\\'|[^'])*'|"(?:\\"|[^"])*"|`(?:\\`|[^`])*`|[^\s#\r\n][^#\r\n]*|)\s*(?:#.*)?$/mg;
@@ -58,14 +58,14 @@ export function parseEnvironmentFiles(
 			.readTextFile(element)
 			.then(
 				innerPipe(
-					EE.whenIsRight(
+					DEither.whenIsRight(
 						innerPipe(
 							parseEnvironmentLine,
 							(value) => nextPush(lastValue, value),
 						),
 					),
 					when(
-						EE.isLeft,
+						DEither.isLeft,
 						exit,
 					),
 				),

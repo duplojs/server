@@ -54,7 +54,7 @@
     }
   },
   "peerDependencies": {
-    "@duplojs/lang": "0.0.1-beta.2"
+    "@duplojs/lang": "0.0.1-beta.6"
   },
   "devDependencies": {
     "@duplojs/code-config": "0.1.0",

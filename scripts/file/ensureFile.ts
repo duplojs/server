@@ -1,4 +1,4 @@
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -6,7 +6,7 @@ declare module "@scripts/implementor" {
 	interface ServerFunction {
 		ensureFile<
 			GenericPath extends string,
-		>(path: GenericPath): Promise<FileSystemLeft<"ensure-file"> | EE.Ok>;
+		>(path: GenericPath): Promise<FileSystemLeft<"ensure-file"> | DEither.Ok>;
 	}
 }
 
@@ -18,8 +18,8 @@ export const ensureFile = implementFunction(
 
 			return fs.open(path, "a")
 				.then((fh) => fh.close())
-				.then(EE.ok)
-				.catch((value) => EE.left("file-system-ensure-file", value));
+				.then(DEither.ok)
+				.catch((value) => DEither.left("file-system-ensure-file", value));
 		},
 		DENO: (path: string) => Deno.open(path, {
 			write: true,
@@ -27,7 +27,7 @@ export const ensureFile = implementFunction(
 			append: true,
 		})
 			.then((fh) => void fh.close())
-			.then(EE.ok)
-			.catch((value) => EE.left("file-system-ensure-file", value)),
+			.then(DEither.ok)
+			.catch((value) => DEither.left("file-system-ensure-file", value)),
 	},
 );

@@ -1,5 +1,5 @@
 import { kindHeritage, unwrap } from "@duplojs/lang";
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import type * as DDP from "@duplojs/lang/dataParser";
 import { createKind } from "@scripts/kind";
 import type * as SF from "@scripts/file";
@@ -11,7 +11,7 @@ export class EnvironmentVariableError extends kindHeritage(
 	Error,
 ) {
 	public constructor(
-		public error: SF.FileSystemLeft<"read-text-file"> | EE.Error<DDP.DataParserError>,
+		public error: SF.FileSystemLeft<"read-text-file"> | DEither.Error<DDP.DataParserError>,
 	) {
 		super({}, ["Failed to load environment variables: one env file could not be read or parsed values do not match the provided schema."]);
 	}
@@ -25,7 +25,7 @@ export async function environmentVariableOrThrow<
 ): Promise<DDP.DataParserObjectShapeOutput<GenericShape>> {
 	const result = await environmentVariable(shape, envFileParams);
 
-	if (EE.isLeft(result)) {
+	if (DEither.isLeft(result)) {
 		throw new EnvironmentVariableError(result);
 	}
 

@@ -1,5 +1,6 @@
-import { Path, type Kind } from "@duplojs/lang";
-import type * as EE from "@duplojs/lang/either";
+import type * as DKind from "@duplojs/lang/kind";
+import * as DPath from "@duplojs/lang/path";
+import type * as DEither from "@duplojs/lang/either";
 import { createKind } from "@scripts/kind";
 import { stat, type StatInfo } from "./stat";
 import { exists } from "./exists";
@@ -7,23 +8,23 @@ import type { FileSystemLeft } from "./types";
 
 const unknownInterfaceKind = createKind("unknownInterface");
 
-export interface UnknownInterface extends Kind<
-	typeof unknownInterfaceKind.definition
+export interface UnknownInterface extends DKind.Kind<
+	typeof unknownInterfaceKind
 > {
-	path: string;
-	getName(): string | null;
-	getParentPath(): string | null;
-	stat(): Promise<FileSystemLeft<"stat"> | EE.Success<StatInfo>>;
-	exist(): Promise<FileSystemLeft<"exists"> | EE.Ok>;
+	path: string & DPath.Path;
+	getName(): (string & DPath.Segment) | null;
+	getParentPath(): (string & DPath.Path) | null;
+	stat(): Promise<FileSystemLeft<"stat"> | DEither.Success<StatInfo>>;
+	exist(): Promise<FileSystemLeft<"exists"> | DEither.Ok>;
 }
 
-export function createUnknownInterface(path: string): UnknownInterface {
+export function createUnknownInterface(path: string & DPath.Path): UnknownInterface {
 	function getName() {
-		return Path.getBaseName(path);
+		return DPath.getBaseName(path);
 	}
 
 	function getParentPath() {
-		return Path.getParentFolderPath(path);
+		return DPath.getParentFolderPath(path);
 	}
 
 	function localStat() {
@@ -34,13 +35,14 @@ export function createUnknownInterface(path: string): UnknownInterface {
 		return exists(path);
 	}
 
-	return unknownInterfaceKind.addTo({
+	return {
 		path,
 		getName,
 		getParentPath,
 		stat: localStat,
 		exist,
-	});
+		[unknownInterfaceKind.runTimeKey]: null,
+	} satisfies DKind.Remove<UnknownInterface> as never;
 }
 
 export function isUnknownInterface(

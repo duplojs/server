@@ -1,14 +1,14 @@
-import { Path } from "@duplojs/lang";
-import * as EE from "@duplojs/lang/either";
+import * as DPath from "@duplojs/lang/path";
+import * as DEither from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		relocate(
-			fromPath: string,
-			toPath: string,
-		): Promise<FileSystemLeft<"relocate"> | EE.Success<string>>;
+			fromPath: string & DPath.Path,
+			toPath: string & DPath.Path,
+		): Promise<FileSystemLeft<"relocate"> | DEither.Success<string & DPath.Path>>;
 	}
 }
 
@@ -17,36 +17,36 @@ export const relocate = implementFunction(
 	{
 		NODE: async(fromPath, newParentPath) => {
 			const fs = await nodeFileSystem.value;
-			const baseName = Path.getBaseName(fromPath);
+			const baseName = DPath.getBaseName(fromPath);
 
 			if (!baseName) {
-				return EE.left("file-system-relocate", new Error(`Invalid base name ${fromPath}`));
+				return DEither.left("file-system-relocate", new Error(`Invalid base name ${fromPath}`));
 			}
 
-			const newPath = Path.resolveRelative([newParentPath, baseName]);
+			const newPath = DPath.resolveRelative([newParentPath, baseName]);
 
 			return fs.rename(
 				fromPath,
 				newPath,
 			)
-				.then(() => EE.success(newPath))
-				.catch((value) => EE.left("file-system-relocate", value));
+				.then(() => DEither.success(newPath))
+				.catch((value) => DEither.left("file-system-relocate", value));
 		},
 		DENO: (fromPath, newParentPath) => {
-			const baseName = Path.getBaseName(fromPath);
+			const baseName = DPath.getBaseName(fromPath);
 
 			if (!baseName) {
-				return Promise.resolve(EE.left("file-system-relocate", new Error(`Invalid base name ${fromPath}`)));
+				return Promise.resolve(DEither.left("file-system-relocate", new Error(`Invalid base name ${fromPath}`)));
 			}
 
-			const newPath = Path.resolveRelative([newParentPath, baseName]);
+			const newPath = DPath.resolveRelative([newParentPath, baseName]);
 
 			return Deno.rename(
 				fromPath,
 				newPath,
 			)
-				.then(() => EE.success(newPath))
-				.catch((value) => EE.left("file-system-relocate", value));
+				.then(() => DEither.success(newPath))
+				.catch((value) => DEither.left("file-system-relocate", value));
 		},
 	},
 );

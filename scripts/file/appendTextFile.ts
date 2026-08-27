@@ -1,4 +1,4 @@
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -7,7 +7,7 @@ declare module "@scripts/implementor" {
 		appendTextFile(
 			path: string,
 			data: string,
-		): Promise<FileSystemLeft<"append-text-file"> | EE.Ok>;
+		): Promise<FileSystemLeft<"append-text-file"> | DEither.Ok>;
 	}
 }
 
@@ -20,15 +20,15 @@ export const appendTextFile = implementFunction(
 				path,
 				data,
 			)
-				.then(EE.ok)
-				.catch((value) => EE.left("file-system-append-text-file", value));
+				.then(DEither.ok)
+				.catch((value) => DEither.left("file-system-append-text-file", value));
 		},
 		DENO: (path, data) => Deno.writeTextFile(
 			path,
 			data,
 			{ append: true },
 		)
-			.then(EE.ok)
-			.catch((value) => EE.left("file-system-append-text-file", value)),
+			.then(DEither.ok)
+			.catch((value) => DEither.left("file-system-append-text-file", value)),
 	},
 );

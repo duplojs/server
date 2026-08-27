@@ -1,19 +1,20 @@
-import * as EE from "@duplojs/lang/either";
-import * as DD from "@duplojs/lang/date";
+import * as DEither from "@duplojs/lang/either";
+import * as DChrono from "@duplojs/lang/chrono";
+import type * as DPath from "@duplojs/lang/path";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 interface SetTimeParams {
-	accessTime: DD.TheDate;
-	modifiedTime: DD.TheDate;
+	accessTime: DChrono.TheDate;
+	modifiedTime: DChrono.TheDate;
 }
 
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		setTime(
-			path: string,
+			path: string & DPath.Path,
 			params: SetTimeParams
-		): Promise<FileSystemLeft<"set-time"> | EE.Ok>;
+		): Promise<FileSystemLeft<"set-time"> | DEither.Ok>;
 	}
 }
 
@@ -24,19 +25,19 @@ export const setTime = implementFunction(
 			const fs = await nodeFileSystem.value;
 			return fs.utimes(
 				path,
-				DD.toTimestamp(accessTime),
-				DD.toTimestamp(modifiedTime),
+				DChrono.toTimestamp(accessTime),
+				DChrono.toTimestamp(modifiedTime),
 			)
-				.then(EE.ok)
-				.catch((value) => EE.left("file-system-set-time", value));
+				.then(DEither.ok)
+				.catch((value) => DEither.left("file-system-set-time", value));
 		},
 		DENO: (path, { accessTime, modifiedTime }) => Deno
 			.utime(
 				path,
-				DD.toTimestamp(accessTime),
-				DD.toTimestamp(modifiedTime),
+				DChrono.toTimestamp(accessTime),
+				DChrono.toTimestamp(modifiedTime),
 			)
-			.then(EE.ok)
-			.catch((value) => EE.left("file-system-set-time", value)),
+			.then(DEither.ok)
+			.catch((value) => DEither.left("file-system-set-time", value)),
 	},
 );

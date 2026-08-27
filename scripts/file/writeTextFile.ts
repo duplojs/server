@@ -1,4 +1,4 @@
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -7,7 +7,7 @@ declare module "@scripts/implementor" {
 		writeTextFile(
 			path: string,
 			data: string,
-		): Promise<FileSystemLeft<"write-text-file"> | EE.Ok>;
+		): Promise<FileSystemLeft<"write-text-file"> | DEither.Ok>;
 	}
 }
 
@@ -21,20 +21,20 @@ export const writeTextFile = implementFunction(
 				data,
 				{ encoding: "utf-8" },
 			)
-				.then(EE.ok)
-				.catch((value) => EE.left("file-system-write-text-file", value));
+				.then(DEither.ok)
+				.catch((value) => DEither.left("file-system-write-text-file", value));
 		},
 		DENO: (path, data) => Deno
 			.writeTextFile(
 				path,
 				data,
 			)
-			.then(EE.ok)
-			.catch((value) => EE.left("file-system-write-text-file", value)),
+			.then(DEither.ok)
+			.catch((value) => DEither.left("file-system-write-text-file", value)),
 		BUN: (path, data) => Bun
 			.file(path)
 			.write(data)
-			.then(EE.ok)
-			.catch((value) => EE.left("file-system-write-text-file", value)),
+			.then(DEither.ok)
+			.catch((value) => DEither.left("file-system-write-text-file", value)),
 	},
 );

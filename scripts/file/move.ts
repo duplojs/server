@@ -1,13 +1,14 @@
-import * as EE from "@duplojs/lang/either";
+import type * as DPath from "@duplojs/lang/path";
+import * as DEither from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		move(
-			fromPath: string,
-			toPath: string,
-		): Promise<FileSystemLeft<"move"> | EE.Ok>;
+			fromPath: string & DPath.Path,
+			toPath: string & DPath.Path,
+		): Promise<FileSystemLeft<"move"> | DEither.Ok>;
 	}
 }
 
@@ -20,15 +21,15 @@ export const move = implementFunction(
 				fromPath,
 				toPath,
 			)
-				.then(EE.ok)
-				.catch((value) => EE.left("file-system-move", value));
+				.then(DEither.ok)
+				.catch((value) => DEither.left("file-system-move", value));
 		},
 		DENO: (fromPath, toPath) => Deno.rename(
 			fromPath,
 			toPath,
 		)
-			.then(EE.ok)
-			.catch((value) => EE.left("file-system-move", value)),
+			.then(DEither.ok)
+			.catch((value) => DEither.left("file-system-move", value)),
 	},
 );
 

@@ -1,6 +1,7 @@
-import { asyncPipe, mimeType, Path, innerPipe } from "@duplojs/lang";
+import { asyncPipe, mimeType, innerPipe } from "@duplojs/lang";
 import type * as DKind from "@duplojs/lang/kind";
-import * as EE from "@duplojs/lang/either";
+import * as DPath from "@duplojs/lang/path";
+import * as DEither from "@duplojs/lang/either";
 import { createKind } from "@scripts/kind";
 import { rename } from "./rename";
 import { exists } from "./exists";
@@ -15,28 +16,28 @@ const fileInterfaceKind = createKind("fileInterface");
 export interface FileInterface extends DKind.Kind<
 	typeof fileInterfaceKind
 > {
-	path: string;
-	getName(): string | null;
+	path: string & DPath.Path;
+	getName(): (string & DPath.Segment) | null;
 	getMimeType(): string | null;
-	getExtension(params?: Path.GetExtensionNameParams): string | null;
-	getParentPath(): string | null;
-	rename(newName: string): Promise<FileSystemLeft<"rename"> | EE.Success<FileInterface>>;
-	relocate(parentPath: string): Promise<FileSystemLeft<"relocate"> | EE.Success<FileInterface>>;
-	move(newPath: string): Promise<FileSystemLeft<"move"> | EE.Success<FileInterface>>;
-	exists(): Promise<FileSystemLeft<"exists"> | EE.Ok>;
-	remove(): Promise<FileSystemLeft<"remove"> | EE.Ok>;
-	stat(): Promise<FileSystemLeft<"stat"> | EE.Success<StatInfo>>;
+	getExtension(params?: DPath.GetExtensionNameParams): (string & DPath.Segment) | null;
+	getParentPath(): (string & DPath.Path) | null;
+	rename(newName: string & DPath.Segment): Promise<FileSystemLeft<"rename"> | DEither.Success<FileInterface>>;
+	relocate(parentPath: string & DPath.Path): Promise<FileSystemLeft<"relocate"> | DEither.Success<FileInterface>>;
+	move(newPath: string & DPath.Path): Promise<FileSystemLeft<"move"> | DEither.Success<FileInterface>>;
+	exists(): Promise<FileSystemLeft<"exists"> | DEither.Ok>;
+	remove(): Promise<FileSystemLeft<"remove"> | DEither.Ok>;
+	stat(): Promise<FileSystemLeft<"stat"> | DEither.Success<StatInfo>>;
 }
 
 export function createFileInterface(
-	path: string,
+	path: string & DPath.Path,
 ): FileInterface {
 	function getName() {
-		return Path.getBaseName(path);
+		return DPath.getBaseName(path);
 	}
 
-	function getExtension(params?: Path.GetExtensionNameParams) {
-		return Path.getExtensionName(path, params);
+	function getExtension(params?: DPath.GetExtensionNameParams) {
+		return DPath.getExtensionName(path, params);
 	}
 
 	function getMimeType() {
@@ -50,42 +51,42 @@ export function createFileInterface(
 	}
 
 	function getParentPath() {
-		return Path.getParentFolderPath(path);
+		return DPath.getParentFolderPath(path);
 	}
 
 	function localExists() {
 		return exists(path);
 	}
 
-	function localRename(newName: string) {
+	function localRename(newName: string & DPath.Segment) {
 		return asyncPipe(
 			rename(path, newName),
-			EE.whenIsRight(
+			DEither.whenIsRight(
 				innerPipe(
 					createFileInterface,
-					EE.success,
+					DEither.success,
 				),
 			),
 		);
 	}
 
-	function localRelocate(newParentPath: string) {
+	function localRelocate(newParentPath: string & DPath.Path) {
 		return asyncPipe(
 			relocate(path, newParentPath),
-			EE.whenIsRight(
+			DEither.whenIsRight(
 				innerPipe(
 					createFileInterface,
-					EE.success,
+					DEither.success,
 				),
 			),
 		);
 	}
 
-	function localMove(newPath: string) {
+	function localMove(newPath: string & DPath.Path) {
 		return asyncPipe(
 			move(path, newPath),
-			EE.whenIsRight(
-				() => EE.success(
+			DEither.whenIsRight(
+				() => DEither.success(
 					createFileInterface(newPath),
 				),
 			),
@@ -100,7 +101,7 @@ export function createFileInterface(
 		return stat(path);
 	}
 
-	return fileInterfaceKind.addTo({
+	return {
 		path,
 		getName,
 		getExtension,
@@ -112,7 +113,8 @@ export function createFileInterface(
 		remove: localRemove,
 		move: localMove,
 		stat: localStat,
-	});
+		[fileInterfaceKind.runTimeKey]: null,
+	} satisfies DKind.Remove<FileInterface> as never;
 }
 
 export function isFileInterface(

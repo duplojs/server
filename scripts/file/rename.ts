@@ -1,14 +1,14 @@
-import { Path } from "@duplojs/lang";
-import * as EE from "@duplojs/lang/either";
+import * as DPath from "@duplojs/lang/path";
+import * as DEither from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		rename(
-			path: string,
-			newName: string,
-		): Promise<FileSystemLeft<"rename"> | EE.Success<string>>;
+			path: string & DPath.Path,
+			newName: string & DPath.Segment,
+		): Promise<FileSystemLeft<"rename"> | DEither.Success<string & DPath.Path>>;
 	}
 }
 
@@ -18,44 +18,36 @@ export const rename = implementFunction(
 		NODE: async(path, newName) => {
 			const fs = await nodeFileSystem.value;
 
-			const parentPath = Path.getParentFolderPath(path);
+			const parentPath = DPath.getParentFolderPath(path);
 
 			if (!parentPath) {
-				return EE.left("file-system-rename", new Error(`Invalid parent path ${parentPath}.`));
+				return DEither.left("file-system-rename", new Error(`Invalid parent path ${path}.`));
 			}
 
-			if (newName.includes("/")) {
-				return EE.left("file-system-rename", new Error(`Invalid new name ${newName}.`));
-			}
-
-			const newPath = Path.resolveRelative([parentPath, newName]);
+			const newPath = DPath.resolveRelative([parentPath, newName]);
 
 			return fs.rename(
 				path,
 				newPath,
 			)
-				.then(() => EE.success(newPath))
-				.catch((value) => EE.left("file-system-rename", value));
+				.then(() => DEither.success(newPath))
+				.catch((value) => DEither.left("file-system-rename", value));
 		},
 		DENO: (path, newName) => {
-			const parentPath = Path.getParentFolderPath(path);
+			const parentPath = DPath.getParentFolderPath(path);
 
 			if (!parentPath) {
-				return Promise.resolve(EE.left("file-system-rename", new Error(`Invalid parent path ${parentPath}.`)));
+				return Promise.resolve(DEither.left("file-system-rename", new Error(`Invalid parent path ${path}.`)));
 			}
 
-			if (newName.includes("/")) {
-				return Promise.resolve(EE.left("file-system-rename", new Error(`Invalid new name ${newName}.`)));
-			}
-
-			const newPath = Path.resolveRelative([parentPath, newName]);
+			const newPath = DPath.resolveRelative([parentPath, newName]);
 
 			return Deno.rename(
 				path,
 				newPath,
 			)
-				.then(() => EE.success(newPath))
-				.catch((value) => EE.left("file-system-rename", value));
+				.then(() => DEither.success(newPath))
+				.catch((value) => DEither.left("file-system-rename", value));
 		},
 	},
 );

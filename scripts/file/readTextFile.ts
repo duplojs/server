@@ -1,4 +1,4 @@
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -8,7 +8,7 @@ declare module "@scripts/implementor" {
 			GenericPath extends string,
 		>(
 			path: GenericPath,
-		): Promise<FileSystemLeft<"read-text-file"> | EE.Success<string>>;
+		): Promise<FileSystemLeft<"read-text-file"> | DEither.Success<string>>;
 	}
 }
 
@@ -18,16 +18,16 @@ export const readTextFile = implementFunction(
 		NODE: async(path) => {
 			const fs = await nodeFileSystem.value;
 			return fs.readFile(path, { encoding: "utf-8" })
-				.then(EE.success)
-				.catch((value) => EE.left("file-system-read-text-file", value));
+				.then(DEither.success)
+				.catch((value) => DEither.left("file-system-read-text-file", value));
 		},
 		DENO: (path) => Deno
 			.readTextFile(path)
-			.then(EE.success)
-			.catch((value) => EE.left("file-system-read-text-file", value)),
+			.then(DEither.success)
+			.catch((value) => DEither.left("file-system-read-text-file", value)),
 		BUN: (path) => Bun.file(path)
 			.text()
-			.then(EE.success)
-			.catch((value) => EE.left("file-system-read-text-file", value)),
+			.then(DEither.success)
+			.catch((value) => DEither.left("file-system-read-text-file", value)),
 	},
 );

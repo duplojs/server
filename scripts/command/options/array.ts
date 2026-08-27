@@ -2,7 +2,7 @@ import { type Kind, pipe, type RemoveKind, unwrap } from "@duplojs/lang";
 import * as SS from "@duplojs/lang/string";
 import * as DDP from "@duplojs/lang/dataParser";
 import type * as AA from "@duplojs/lang/array";
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import { initOption, type Option } from "./base";
 import type { EligibleSpec } from "../types";
 import type { ComputeOptionSpec } from "./types";
@@ -190,7 +190,7 @@ export function createArrayOption(
 						? await dataParser.asyncParse(values)
 						: dataParser.parse(values);
 
-					if (EE.isLeft(result)) {
+					if (DEither.isLeft(result)) {
 						return addIssueDataParser(
 							error,
 							unwrap(result),

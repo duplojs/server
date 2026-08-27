@@ -1,4 +1,4 @@
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -18,7 +18,7 @@ declare module "@scripts/implementor" {
 			oldPath: string,
 			newPath: string,
 			params?: SymlinkParams
-		): Promise<FileSystemLeft<"symlink"> | EE.Ok>;
+		): Promise<FileSystemLeft<"symlink"> | DEither.Ok>;
 	}
 }
 
@@ -32,8 +32,8 @@ export const symlink = implementFunction(
 				newPath,
 				params?.type,
 			)
-				.then(EE.ok)
-				.catch((value) => EE.left("file-system-symlink", value));
+				.then(DEither.ok)
+				.catch((value) => DEither.left("file-system-symlink", value));
 		},
 		DENO: (oldPath, newPath, params) => Deno
 			.symlink(
@@ -41,7 +41,7 @@ export const symlink = implementFunction(
 				newPath,
 				params,
 			)
-			.then(EE.ok)
-			.catch((value) => EE.left("file-system-symlink", value)),
+			.then(DEither.ok)
+			.catch((value) => DEither.left("file-system-symlink", value)),
 	},
 );

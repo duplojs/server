@@ -1,5 +1,5 @@
 import { instanceOf, pipe, when } from "@duplojs/lang";
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
 import type { FileSystemLeft } from "./types";
 
@@ -10,7 +10,7 @@ declare module "@scripts/implementor" {
 		>(
 			path: GenericPath,
 			size?: number,
-		): Promise<FileSystemLeft<"truncate"> | EE.Ok>;
+		): Promise<FileSystemLeft<"truncate"> | DEither.Ok>;
 	}
 }
 
@@ -20,8 +20,8 @@ export const truncate = implementFunction(
 		NODE: async(path, size) => {
 			const fs = await nodeFileSystem.value;
 			return fs.truncate(path, size)
-				.then(EE.ok)
-				.catch((value) => EE.left("file-system-truncate", value));
+				.then(DEither.ok)
+				.catch((value) => DEither.left("file-system-truncate", value));
 		},
 		DENO: (path: string, size) => pipe(
 			path,
@@ -31,8 +31,8 @@ export const truncate = implementFunction(
 			),
 			(stringPath) => Deno
 				.truncate(stringPath, size)
-				.then(EE.ok)
-				.catch((value) => EE.left("file-system-truncate", value)),
+				.then(DEither.ok)
+				.catch((value) => DEither.left("file-system-truncate", value)),
 		),
 	},
 );

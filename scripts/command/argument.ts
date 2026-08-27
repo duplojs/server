@@ -1,5 +1,5 @@
 import { type RemoveKind, type Kind, unwrap } from "@duplojs/lang";
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import type * as DDP from "@duplojs/lang/dataParser";
 import { createKind } from "@scripts/kind";
 import type { EligibleSpec, EligibleSpecOutput } from "./types";
@@ -100,7 +100,7 @@ export function createArgument<
 					? await dataParser.asyncParse(argument)
 					: dataParser.parse(argument);
 
-				if (EE.isLeft(result)) {
+				if (DEither.isLeft(result)) {
 					return addIssueDataParser(
 						error,
 						unwrap(result),

@@ -1,5 +1,5 @@
 import { kindHeritage } from "@duplojs/lang";
-import * as EE from "@duplojs/lang/either";
+import * as DEither from "@duplojs/lang/either";
 import { createKind } from "@scripts/kind";
 import { setCurrentWorkingDirectory } from "./setCurrentWorkingDirectory";
 
@@ -20,7 +20,7 @@ export function setCurrentWorkingDirectoryOrThrow<
 ): void {
 	const result = setCurrentWorkingDirectory(path);
 
-	if (EE.isLeft(result)) {
+	if (DEither.isLeft(result)) {
 		throw new SetCurrentWorkingDirectoryError();
 	}
 

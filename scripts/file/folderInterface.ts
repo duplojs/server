@@ -1,5 +1,7 @@
-import { asyncPipe, innerPipe, Path, type Kind } from "@duplojs/lang";
-import * as EE from "@duplojs/lang/either";
+import { asyncPipe, innerPipe } from "@duplojs/lang";
+import type * as DKind from "@duplojs/lang/kind";
+import * as DPath from "@duplojs/lang/path";
+import * as DEither from "@duplojs/lang/either";
 import { createKind } from "@scripts/kind";
 import { move } from "./move";
 import { exists } from "./exists";
@@ -15,60 +17,60 @@ import { relocate } from "./relocate";
 
 const folderInterfaceKind = createKind("folderInterface");
 
-export interface FolderInterface extends Kind<
-	typeof folderInterfaceKind.definition
+export interface FolderInterface extends DKind.Kind<
+	typeof folderInterfaceKind
 > {
-	path: string;
-	getName(): string | null;
-	getParentPath(): string | null;
-	rename(newName: string): Promise<FileSystemLeft<"rename"> | EE.Success<FolderInterface>>;
-	exists(): Promise<FileSystemLeft<"exists"> | EE.Ok>;
-	relocate(parentPath: string): Promise<FileSystemLeft<"relocate"> | EE.Success<FolderInterface>>;
-	move(newPath: string): Promise<FileSystemLeft<"move"> | EE.Success<FolderInterface>>;
-	remove(): Promise<FileSystemLeft<"remove"> | EE.Ok>;
-	getChildren(): Promise<FileSystemLeft<"read-directory"> | EE.Success<string[]>>;
-	stat(): Promise<FileSystemLeft<"stat"> | EE.Success<StatInfo>>;
-	walk(): Promise<FileSystemLeft<"walk-directory"> | EE.Success<Generator<FolderInterface | FileInterface | UnknownInterface>>>;
+	path: string & DPath.Path;
+	getName(): (string & DPath.Segment) | null;
+	getParentPath(): (string & DPath.Path) | null;
+	rename(newName: (string & DPath.Segment)): Promise<FileSystemLeft<"rename"> | DEither.Success<FolderInterface>>;
+	exists(): Promise<FileSystemLeft<"exists"> | DEither.Ok>;
+	relocate(parentPath: string & DPath.Path): Promise<FileSystemLeft<"relocate"> | DEither.Success<FolderInterface>>;
+	move(newPath: string & DPath.Path): Promise<FileSystemLeft<"move"> | DEither.Success<FolderInterface>>;
+	remove(): Promise<FileSystemLeft<"remove"> | DEither.Ok>;
+	getChildren(): Promise<FileSystemLeft<"read-directory"> | DEither.Success<(string & DPath.Path)[]>>;
+	stat(): Promise<FileSystemLeft<"stat"> | DEither.Success<StatInfo>>;
+	walk(): Promise<FileSystemLeft<"walk-directory"> | DEither.Success<Generator<FolderInterface | FileInterface | UnknownInterface>>>;
 }
 
-export function createFolderInterface(path: string): FolderInterface {
+export function createFolderInterface(path: string & DPath.Path): FolderInterface {
 	function getName() {
-		return Path.getBaseName(path);
+		return DPath.getBaseName(path);
 	}
 
 	function getParentPath() {
-		return Path.getParentFolderPath(path);
+		return DPath.getParentFolderPath(path);
 	}
 
-	function localRename(newName: string) {
+	function localRename(newName: string & DPath.Segment) {
 		return asyncPipe(
 			rename(path, newName),
-			EE.whenIsRight(
+			DEither.whenIsRight(
 				innerPipe(
 					createFolderInterface,
-					EE.success,
+					DEither.success,
 				),
 			),
 		);
 	}
 
-	function localRelocate(newParentPath: string) {
+	function localRelocate(newParentPath: string & DPath.Path) {
 		return asyncPipe(
 			relocate(path, newParentPath),
-			EE.whenIsRight(
+			DEither.whenIsRight(
 				innerPipe(
 					createFolderInterface,
-					EE.success,
+					DEither.success,
 				),
 			),
 		);
 	}
 
-	function localMove(newPath: string) {
+	function localMove(newPath: string & DPath.Path) {
 		return asyncPipe(
 			move(path, newPath),
-			EE.whenIsRight(
-				() => EE.success(
+			DEither.whenIsRight(
+				() => DEither.success(
 					createFolderInterface(newPath),
 				),
 			),
@@ -95,7 +97,7 @@ export function createFolderInterface(path: string): FolderInterface {
 		return walkDirectory(path);
 	}
 
-	return folderInterfaceKind.addTo({
+	return {
 		path,
 		getName,
 		getParentPath,
@@ -107,7 +109,8 @@ export function createFolderInterface(path: string): FolderInterface {
 		getChildren,
 		stat: localStat,
 		walk,
-	});
+		[folderInterfaceKind.runTimeKey]: null,
+	} satisfies DKind.Remove<FolderInterface> as never;
 }
 
 export function isFolderInterface(
