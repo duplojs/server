@@ -14,6 +14,7 @@ export interface EnvironmentVariableFileParams {
 	includedEnvironmentFiles?: (string & DPath.Path)[];
 	override?: boolean;
 	justRead?: boolean;
+	codecs?: DDataStructure.Codecs;
 }
 
 declare module "@scripts/implementor" {
@@ -59,7 +60,10 @@ export const environmentVariable = implementFunction(
 			const expandEnvResult = expandEnvironmentVariables(overrideEnvResult);
 
 			const schema = DDataStructure.object(shape);
-			const parsedEnvResult = await schema.asyncDecode(expandEnvResult);
+			const parsedEnvResult = await schema.asyncUnsafeDecode(
+				envFileParams?.codecs ?? DDataStructure.codecsString,
+				expandEnvResult,
+			);
 
 			if (DEither.isLeft(parsedEnvResult)) {
 				return parsedEnvResult;
@@ -89,7 +93,10 @@ export const environmentVariable = implementFunction(
 			const expandEnvResult = expandEnvironmentVariables(overrideEnvResult);
 
 			const schema = DDataStructure.object(shape);
-			const parsedEnvResult = await schema.asyncDecode(expandEnvResult);
+			const parsedEnvResult = await schema.asyncUnsafeDecode(
+				envFileParams?.codecs ?? DDataStructure.codecsString,
+				expandEnvResult,
+			);
 
 			if (DEither.isLeft(parsedEnvResult)) {
 				return parsedEnvResult;
