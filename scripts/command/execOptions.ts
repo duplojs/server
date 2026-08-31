@@ -1,6 +1,6 @@
 import type { AnyTuple, SimplifyTopLevel } from "@duplojs/lang";
-import * as GG from "@duplojs/lang/generator";
-import * as OO from "@duplojs/lang/object";
+import * as DGenerator from "@duplojs/lang/generator";
+import * as DObject from "@duplojs/lang/object";
 import { createError, interpretExecOptionError, SymbolCommandError } from "./error";
 import { logExecOptionHelp, helpOption } from "./help";
 import type { Option } from "./options";
@@ -40,9 +40,9 @@ export async function execOptions(
 		return void exitProcess(0);
 	}
 
-	const result = await GG.asyncReduce(
+	const result = await DGenerator.asyncReduce(
 		options,
-		GG.reduceFrom<{
+		DGenerator.reduceFrom<{
 			options: Record<string, unknown>;
 			restArgs: readonly string[];
 		}>({
@@ -57,7 +57,7 @@ export async function execOptions(
 			}
 
 			return next({
-				options: OO.override(
+				options: DObject.override(
 					lastValue.options,
 					{
 						[option.name]: optionResult.result,

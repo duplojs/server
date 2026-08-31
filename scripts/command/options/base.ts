@@ -1,6 +1,6 @@
 import type { RemoveKind, Kind, MaybePromise } from "@duplojs/lang";
-import * as AA from "@duplojs/lang/array";
-import * as SS from "@duplojs/lang/string";
+import * as DArray from "@duplojs/lang/array";
+import * as DString from "@duplojs/lang/string";
 import { createKind } from "@scripts/kind";
 import { addIssue, type CommandError, SymbolCommandError } from "../error";
 
@@ -53,11 +53,11 @@ export function initOption<
 			args: readonly string[],
 			error: CommandError,
 		) => {
-			const result = AA.reduce(
+			const result = DArray.reduce(
 				args,
-				AA.reduceFrom(null),
+				DArray.reduceFrom(null),
 				({ element, next, exit, index }) => {
-					const extractResult = SS.extract(element, regexOption);
+					const extractResult = DString.extract(element, regexOption);
 
 					if (!extractResult) {
 						return next(null);
@@ -69,7 +69,7 @@ export function initOption<
 						index,
 					};
 
-					if (self.name !== result.key && !AA.includes(self.aliases, result.key)) {
+					if (self.name !== result.key && !DArray.includes(self.aliases, result.key)) {
 						return next(null);
 					}
 
@@ -96,7 +96,7 @@ export function initOption<
 				};
 			} else if (self.hasValue) {
 				const value = result.value ?? args[result.index + 1];
-				const isOption = SS.test(value ?? "", regexOption);
+				const isOption = DString.test(value ?? "", regexOption);
 
 				if (isOption) {
 					return addIssue(
@@ -125,7 +125,7 @@ export function initOption<
 
 				return {
 					result: executeResult,
-					argumentRest: AA.spliceDelete(
+					argumentRest: DArray.spliceDelete(
 						args,
 						result.index,
 						result.value === undefined && args[result.index + 1] !== undefined
@@ -160,7 +160,7 @@ export function initOption<
 
 			return {
 				result: executeResult,
-				argumentRest: AA.spliceDelete(args, result.index, 1),
+				argumentRest: DArray.spliceDelete(args, result.index, 1),
 			};
 		},
 		aliases: params?.aliases ?? [],

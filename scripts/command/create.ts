@@ -1,7 +1,7 @@
 import { type Kind, type AnyFunction, type RemoveKind, type MaybePromise, type AnyTuple, justExec, type ComputedTypeError, type IsEqual, type And, type Not, type UnionContain, type NeverCoalescing } from "@duplojs/lang";
-import * as AA from "@duplojs/lang/array";
-import * as GG from "@duplojs/lang/generator";
-import * as OO from "@duplojs/lang/object";
+import * as DArray from "@duplojs/lang/array";
+import * as DGenerator from "@duplojs/lang/generator";
+import * as DObject from "@duplojs/lang/object";
 import { createKind } from "@scripts/kind";
 import { exitProcess } from "@scripts/common/exitProcess";
 import type { Option } from "./options";
@@ -184,7 +184,7 @@ export function create(
 							error.currentCommandPath[
 								error.currentCommandPath.length
 							] = command.name;
-							return command.execute(AA.shift(args), error);
+							return command.execute(DArray.shift(args), error);
 						}
 					}
 				}
@@ -198,9 +198,9 @@ export function create(
 					return void exitProcess(0);
 				}
 
-				const commandOptions = await GG.asyncReduce(
+				const commandOptions = await DGenerator.asyncReduce(
 					self.options,
-					GG.reduceFrom<{
+					DGenerator.reduceFrom<{
 						options: Record<string, unknown>;
 						restArgs: readonly string[];
 					}>({
@@ -215,7 +215,7 @@ export function create(
 						}
 
 						return next({
-							options: OO.override(
+							options: DObject.override(
 								lastValue.options,
 								{
 									[option.name]: optionResult.result,
@@ -248,9 +248,9 @@ export function create(
 						return SymbolCommandError;
 					}
 
-					const commandArguments = await GG.asyncReduce(
+					const commandArguments = await DGenerator.asyncReduce(
 						self.subject.args,
-						GG.reduceFrom<{
+						DGenerator.reduceFrom<{
 							args: Record<string, unknown>;
 							restArgs: readonly string[];
 						}>({
@@ -258,7 +258,7 @@ export function create(
 							restArgs: commandOptions.restArgs,
 						}),
 						async({ element: argument, lastValue, next, exit }) => {
-							const firstArgument = AA.first(lastValue.restArgs);
+							const firstArgument = DArray.first(lastValue.restArgs);
 
 							const argumentResult = await argument.execute(firstArgument, error);
 
@@ -267,11 +267,11 @@ export function create(
 							}
 
 							return next({
-								args: OO.override(
+								args: DObject.override(
 									lastValue.args,
 									{ [argument.name]: argumentResult },
 								),
-								restArgs: AA.shift(lastValue.restArgs),
+								restArgs: DArray.shift(lastValue.restArgs),
 							});
 						},
 					);

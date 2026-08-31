@@ -1,49 +1,32 @@
-import { A, DP, E, O, pipe, unwrap } from "@duplojs/lang";
+import * as DCommon from "@duplojs/lang/common";
+import * as DDataStructure from "@duplojs/lang/dataStructure";
+import * as DEither from "@duplojs/lang/either";
+import * as DObject from "@duplojs/lang/object";
+import * as DArray from "@duplojs/lang/array";
+import type * as DPath from "@duplojs/lang/path";
+import type * as DServerFile from "@scripts/file";
 import { implementFunction } from "@scripts/implementor";
-import type * as SF from "@scripts/file";
 import { parseEnvironmentFiles } from "./parseEnvironmentFiles";
 import { expandEnvironmentVariables } from "./expandEnvironmentVariables";
 import { overrideEnvironmentVariables } from "./overrideEnvironmentVariables";
 
 export interface EnvironmentVariableFileParams {
-
-	/**
-	 * {@include common/environmentVariable/properties/includedFiles.md}
-	 */
-	includedFiles?: string[];
-
-	/**
-	 * @deprecated This property has been replaced by `includedFiles`.
-	 */
-	paths?: string[];
-
-	/**
-	 * {@include common/environmentVariable/properties/override.md}
-	 */
+	includedEnvironmentFiles?: (string & DPath.Path)[];
 	override?: boolean;
-
-	/**
-	 * {@include common/environmentVariable/properties/justRead.md}
-	 */
 	justRead?: boolean;
 }
-
-/**
- * @deprecated Use `EnvironmentVariableFileParams` instead.
- */
-export type EnvironmentVariableParams = EnvironmentVariableFileParams;
 
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		environmentVariable<
-			GenericShape extends DP.DataParserObjectShape,
+			GenericShape extends DDataStructure.ShapeObjectStructure,
 		>(
 			shape: GenericShape,
 			envFileParams?: EnvironmentVariableFileParams,
 		): Promise<
-			| E.Success<DP.DataParserObjectShapeOutput<GenericShape>>
-			| SF.FileSystemLeft<"read-text-file">
-			| E.Error<DP.DataParserError>
+			| DEither.Right<"decode-success", DDataStructure.ShapeObjectStructureValue<GenericShape>>
+			| DServerFile.FileSystemLeft<"read-text-file">
+			| DEither.Left<"decode-error", DDataStructure.Error>
 		>;
 	}
 }
@@ -52,19 +35,19 @@ export const environmentVariable = implementFunction(
 	"environmentVariable",
 	{
 		NODE: async(shape, envFileParams) => {
-			const baseEnv = pipe(
+			const baseEnv = DCommon.pipe(
 				process.env,
-				O.entries,
-				A.filter((entry) => entry[1] !== undefined),
-				O.fromEntries,
+				DObject.entries,
+				DArray.filter((entry) => entry[1] !== undefined),
+				DObject.fromEntries,
 			);
 
 			const parseEnvFileResult = await parseEnvironmentFiles(
 				baseEnv,
-				envFileParams?.includedFiles ?? envFileParams?.paths ?? [],
+				envFileParams?.includedEnvironmentFiles ?? [],
 			);
 
-			if (E.isLeft(parseEnvFileResult)) {
+			if (DEither.isLeft(parseEnvFileResult)) {
 				return parseEnvFileResult;
 			}
 
@@ -75,15 +58,15 @@ export const environmentVariable = implementFunction(
 
 			const expandEnvResult = expandEnvironmentVariables(overrideEnvResult);
 
-			const schema = DP.object(shape);
-			const parsedEnvResult = schema.parse(expandEnvResult);
+			const schema = DDataStructure.object(shape);
+			const parsedEnvResult = await schema.asyncDecode(expandEnvResult);
 
-			if (E.isLeft(parsedEnvResult)) {
+			if (DEither.isLeft(parsedEnvResult)) {
 				return parsedEnvResult;
 			}
 
 			if (envFileParams?.justRead !== true) {
-				process.env = unwrap(expandEnvResult);
+				process.env = expandEnvResult;
 			}
 
 			return parsedEnvResult;
@@ -91,10 +74,10 @@ export const environmentVariable = implementFunction(
 		DENO: async(shape, envFileParams) => {
 			const parseEnvFileResult = await parseEnvironmentFiles(
 				Deno.env.toObject(),
-				envFileParams?.includedFiles ?? envFileParams?.paths ?? [],
+				envFileParams?.includedEnvironmentFiles ?? [],
 			);
 
-			if (E.isLeft(parseEnvFileResult)) {
+			if (DEither.isLeft(parseEnvFileResult)) {
 				return parseEnvFileResult;
 			}
 
@@ -105,17 +88,19 @@ export const environmentVariable = implementFunction(
 
 			const expandEnvResult = expandEnvironmentVariables(overrideEnvResult);
 
-			const schema = DP.object(shape);
-			const parsedEnvResult = schema.parse(expandEnvResult);
+			const schema = DDataStructure.object(shape);
+			const parsedEnvResult = await schema.asyncDecode(expandEnvResult);
 
-			if (E.isLeft(parsedEnvResult)) {
+			if (DEither.isLeft(parsedEnvResult)) {
 				return parsedEnvResult;
 			}
 
 			if (envFileParams?.justRead !== true) {
-				for (const [key, value] of O.entries(expandEnvResult)) {
+				for (const [key, value] of DObject.entries(expandEnvResult)) {
 					if (value) {
 						Deno.env.set(key, value);
+					} else {
+						Deno.env.delete(key);
 					}
 				}
 			}

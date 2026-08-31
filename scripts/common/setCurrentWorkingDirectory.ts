@@ -1,12 +1,11 @@
-import { instanceOf, pipe, when } from "@duplojs/lang";
 import * as DEither from "@duplojs/lang/either";
-import * as PP from "@duplojs/lang/pattern";
+import type * as DPath from "@duplojs/lang/path";
 import { implementFunction } from "@scripts/implementor";
 
 declare module "@scripts/implementor" {
 	interface ServerFunction {
 		setCurrentWorkingDirectory<
-			GenericPath extends string,
+			GenericPath extends string & DPath.Path,
 		>(path: GenericPath): DEither.Fail | DEither.Ok;
 	}
 }
@@ -14,31 +13,15 @@ declare module "@scripts/implementor" {
 export const setCurrentWorkingDirectory = implementFunction(
 	"setCurrentWorkingDirectory",
 	{
-		NODE: (path: string) => pipe(
-			path,
-			when(
-				instanceOf(URL),
-				({ pathname }) => decodeURIComponent(pathname),
-			),
-			(path) => DEither.safeCallback(() => void process.chdir(path)),
-			PP.when(
-				DEither.isLeft,
-				DEither.fail,
-			),
-			PP.otherwise(DEither.ok),
+		NODE: (path) => DEither.whenIsRightOtherwise(
+			DEither.safeCallback(() => void process.chdir(path)),
+			DEither.ok,
+			DEither.fail,
 		),
-		DENO: (path: string) => pipe(
-			path,
-			when(
-				instanceOf(URL),
-				({ pathname }) => decodeURIComponent(pathname),
-			),
-			(path) => DEither.safeCallback(() => void Deno.chdir(path)),
-			PP.when(
-				DEither.isLeft,
-				DEither.fail,
-			),
-			PP.otherwise(DEither.ok),
+		DENO: (path) => DEither.whenIsRightOtherwise(
+			DEither.safeCallback(() => void Deno.chdir(path)),
+			DEither.ok,
+			DEither.fail,
 		),
 	},
 );

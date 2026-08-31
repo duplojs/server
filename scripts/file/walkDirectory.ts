@@ -1,6 +1,6 @@
 import { forwardAsserts, innerPipe } from "@duplojs/lang";
 import * as DPath from "@duplojs/lang/path";
-import * as GG from "@duplojs/lang/generator";
+import * as DGenerator from "@duplojs/lang/generator";
 import * as DEither from "@duplojs/lang/either";
 import * as PP from "@duplojs/lang/pattern";
 import { implementFunction, nodeFileSystem } from "@scripts/implementor";
@@ -44,7 +44,7 @@ export const walkDirectory = implementFunction(
 			)
 				.then(
 					innerPipe(
-						GG.map(
+						DGenerator.map(
 							innerPipe(
 								PP.when(
 									(dirent) => dirent.isFile(),

@@ -1,6 +1,6 @@
-import * as GG from "@duplojs/lang/generator";
-import * as OO from "@duplojs/lang/object";
-import * as SS from "@duplojs/lang/string";
+import * as DGenerator from "@duplojs/lang/generator";
+import * as DObject from "@duplojs/lang/object";
+import * as DString from "@duplojs/lang/string";
 
 const envVarRegex = /(?<!\\)\${(?<value>[^{}]+)}/g;
 const escapedDollarRegex = /\\\$/g;
@@ -10,7 +10,7 @@ export function expandValue(
 	env: Record<string, string>,
 	stack = new Set<string>(),
 ): string {
-	return SS.replace(
+	return DString.replace(
 		value,
 		envVarRegex,
 		({ namedGroups }) => {
@@ -34,13 +34,13 @@ export function expandValue(
 }
 
 export function expandEnvironmentVariables(env: Record<string, string>) {
-	return GG.reduce(
-		OO.entries(env),
-		GG.reduceFrom<Record<string, string>>(env),
-		({ element: [key, value], lastValue, nextWithObject }) => nextWithObject(
+	return DGenerator.reduce(
+		DObject.entries(env),
+		DGenerator.reduceFrom<Record<string, string>>(env),
+		({ item: [key, value], lastValue, nextWithObject }) => nextWithObject(
 			lastValue,
 			{
-				[key]: SS.replaceAll(
+				[key]: DString.replaceAll(
 					expandValue(value, lastValue),
 					escapedDollarRegex,
 					"$",

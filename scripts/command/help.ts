@@ -1,5 +1,5 @@
 import { justReturn, pipe, Printer } from "@duplojs/lang";
-import * as AA from "@duplojs/lang/array";
+import * as DArray from "@duplojs/lang/array";
 import * as PP from "@duplojs/lang/pattern";
 import * as DDP from "@duplojs/lang/dataParser";
 import * as SDP from "@scripts/dataStructure";
@@ -43,28 +43,28 @@ export function formatDataParser(dataParser: DDP.DataParser): string {
 			DDP.identifier(DDP.literalKind),
 			(subject) => pipe(
 				subject.definition.value,
-				AA.map(String),
-				AA.join(" | "),
+				DArray.map(String),
+				DArray.join(" | "),
 			),
 		)
 		.when(
 			DDP.identifier(DDP.templateLiteralKind),
 			(dataParser) => pipe(
 				dataParser.definition.template,
-				AA.map(
+				DArray.map(
 					(part) => DDP.identifier(part, DDP.dataParserKind)
 						? `\${${formatDataParser(part)}}`
 						: String(part),
 				),
-				AA.join(""),
+				DArray.join(""),
 			),
 		)
 		.when(
 			DDP.identifier(DDP.unionKind),
 			(dataParser) => pipe(
 				dataParser.definition.options,
-				AA.map(formatDataParser),
-				AA.join(" | "),
+				DArray.map(formatDataParser),
+				DArray.join(" | "),
 			),
 		)
 		.when(
@@ -88,8 +88,8 @@ export function formatDataParser(dataParser: DDP.DataParser): string {
 			(dataParser) => {
 				const parts = pipe(
 					dataParser.definition.shape,
-					AA.map(formatDataParser),
-					AA.join(", "),
+					DArray.map(formatDataParser),
+					DArray.join(", "),
 				);
 				const rest = dataParser.definition.rest
 					? `${parts ? ", " : ""}...${formatDataParser(dataParser.definition.rest)}[]`
@@ -124,7 +124,7 @@ export function renderOptionsHelp(
 ): string {
 	return Printer.renderParagraph([
 		`${Printer.indent(depth)}${Printer.colorizedBold("OPTIONS:", "blue")}`,
-		AA.map(
+		DArray.map(
 			options,
 			(option) => {
 				const optionMetadata = getOptionMetadata(option);
@@ -137,9 +137,9 @@ export function renderOptionsHelp(
 						Printer.colorized(
 							pipe(
 								option.aliases,
-								AA.map((alias) => `-${alias},`),
-								AA.push(`--${option.name}`),
-								AA.join(" "),
+								DArray.map((alias) => `-${alias},`),
+								DArray.push(`--${option.name}`),
+								DArray.join(" "),
 							),
 							"gray",
 						),
@@ -164,13 +164,13 @@ export function renderArgumentsHelp(
 				Printer.colorized(
 					pipe(
 						args,
-						AA.map((argument) => argument.optional ? `<?${argument.name}>` : `<${argument.name}>`),
-						AA.join(" "),
+						DArray.map((argument) => argument.optional ? `<?${argument.name}>` : `<${argument.name}>`),
+						DArray.join(" "),
 					),
 					"gray",
 				),
 			]),
-			AA.map(
+			DArray.map(
 				args,
 				(argument) => Printer.renderParagraph(
 					[
@@ -215,7 +215,7 @@ export function renderCommandHelp(
 		);
 	}
 
-	if (AA.minElements(command.options, 1)) {
+	if (DArray.minElements(command.options, 1)) {
 		logs.push(renderOptionsHelp(command.options, depth + 1));
 	}
 

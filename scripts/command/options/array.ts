@@ -1,7 +1,7 @@
 import { type Kind, pipe, type RemoveKind, unwrap } from "@duplojs/lang";
-import * as SS from "@duplojs/lang/string";
+import * as DString from "@duplojs/lang/string";
 import * as DDP from "@duplojs/lang/dataParser";
-import type * as AA from "@duplojs/lang/array";
+import type * as DArray from "@duplojs/lang/array";
 import * as DEither from "@duplojs/lang/either";
 import { initOption, type Option } from "./base";
 import type { EligibleSpec } from "../types";
@@ -75,7 +75,7 @@ export function createArrayOption<
 ): ArrayOption<
 	GenericName,
 	[
-		...AA.CreateTuple<
+		...DArray.CreateTuple<
 			ComputeOptionSpec<GenericSpec>,
 			GenericMinValues
 		>,
@@ -121,7 +121,7 @@ export function createArrayOption<
 ): ArrayOption<
 	GenericName,
 	| [
-		...AA.CreateTuple<
+		...DArray.CreateTuple<
 			ComputeOptionSpec<GenericSpec>,
 			GenericMinValues
 		>,
@@ -183,7 +183,7 @@ export function createArrayOption(
 					}
 
 					const values = value !== undefined
-						? SS.split(value, self.separator)
+						? DString.split(value, self.separator)
 						: undefined;
 
 					const result = dataParser.isAsynchronous()

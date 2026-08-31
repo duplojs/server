@@ -1,8 +1,9 @@
-import { innerPipe, pipe, when } from "@duplojs/lang";
-import * as GG from "@duplojs/lang/generator";
-import * as SS from "@duplojs/lang/string";
+import * as DCommon from "@duplojs/lang/common";
+import type * as DPath from "@duplojs/lang/path";
+import * as DGenerator from "@duplojs/lang/generator";
+import * as DString from "@duplojs/lang/string";
 import * as DEither from "@duplojs/lang/either";
-import * as SF from "@scripts/file";
+import * as DServerFile from "@scripts/file";
 
 const lineRegex = /^(?:export\s+)?(?<key>[A-Z_][A-Z0-9_]*)=(?<value>'(?:\\'|[^'])*'|"(?:\\"|[^"])*"|`(?:\\`|[^`])*`|[^\s#\r\n][^#\r\n]*|)\s*(?:#.*)?$/mg;
 const endLineBreakerRegex = /\r\n?/mg;
@@ -11,27 +12,27 @@ const backCartRegex = /\\r/g;
 const newLineRegex = /\\n/g;
 
 export function parseEnvironmentLine(line: string) {
-	return pipe(
+	return DCommon.pipe(
 		line,
-		SS.replace(endLineBreakerRegex, "\n"),
-		SS.extractAll(lineRegex),
-		GG.reduce(
-			GG.reduceFrom<Record<string, string>>({}),
-			({ element, nextWithObject, lastValue, next }) => {
-				if (element.namedGroups?.key && element.namedGroups?.value) {
+		DString.replace(endLineBreakerRegex, "\n"),
+		DString.extractAll(lineRegex),
+		DGenerator.reduce(
+			DGenerator.reduceFrom<Record<string, string>>({}),
+			({ item, nextWithObject, lastValue, next }) => {
+				if (item.namedGroups?.key && item.namedGroups?.value) {
 					return nextWithObject(
 						lastValue,
 						{
-							[element.namedGroups.key]: pipe(
-								element.namedGroups.value,
+							[item.namedGroups.key]: DCommon.pipe(
+								item.namedGroups.value,
 								(value) => {
-									const surroundingValue = SS.replace(value, surroundingQuoteRegex, "$2");
+									const surroundingValue = DString.replace(value, surroundingQuoteRegex, "$2");
 
-									if (SS.startsWith(value, "\"")) {
-										return pipe(
+									if (DString.startsWith(value, "\"")) {
+										return DCommon.pipe(
 											surroundingValue,
-											SS.replace(newLineRegex, "\n"),
-											SS.replace(backCartRegex, "\r"),
+											DString.replace(newLineRegex, "\n"),
+											DString.replace(backCartRegex, "\r"),
 										);
 									}
 
@@ -49,22 +50,22 @@ export function parseEnvironmentLine(line: string) {
 
 export function parseEnvironmentFiles(
 	baseEnv: Record<string, string>,
-	paths: string[],
+	paths: (string & DPath.Path)[],
 ) {
-	return GG.asyncReduce(
+	return DGenerator.asyncReduce(
 		paths,
-		GG.reduceFrom<Record<string, string>[]>([baseEnv]),
-		({ lastValue, element, nextPush, exit }) => SF
-			.readTextFile(element)
+		DGenerator.reduceFrom<Record<string, string>[]>([baseEnv]),
+		({ lastValue, item, nextPush, exit }) => DServerFile
+			.readTextFile(item)
 			.then(
-				innerPipe(
+				DCommon.innerPipe(
 					DEither.whenIsRight(
-						innerPipe(
+						DCommon.innerPipe(
 							parseEnvironmentLine,
 							(value) => nextPush(lastValue, value),
 						),
 					),
-					when(
+					DCommon.when(
 						DEither.isLeft,
 						exit,
 					),
