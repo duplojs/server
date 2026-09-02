@@ -1,172 +1,191 @@
-import type { RemoveKind, Kind, MaybePromise } from "@duplojs/lang";
+import * as DCommon from "@duplojs/lang/common";
+import type * as DKind from "@duplojs/lang/kind";
 import * as DArray from "@duplojs/lang/array";
 import * as DString from "@duplojs/lang/string";
 import { createKind } from "@scripts/kind";
-import { addIssue, type CommandError, SymbolCommandError } from "../error";
+import { type Error, SymbolCommandError } from "../error";
 
 export const optionKind = createKind("command-option");
 const regexOption = /^(?<dashes>-{1,2})(?<key>[A-Za-z0-9][A-Za-z0-9_-]*)(?:=(?<value>.*))?$/;
 
 export interface Option<
 	GenericName extends string = string,
-	GenericExecuteOutputValue extends unknown = unknown,
-> extends Kind<typeof optionKind.definition> {
+	GenericValue extends unknown = unknown,
+> extends DKind.Kind<typeof optionKind> {
 	readonly name: GenericName;
 	readonly description: string | null;
 	readonly aliases: readonly string[];
-	readonly hasValue: boolean;
 	execute(
 		args: readonly string[],
-		error: CommandError,
+		error: Error,
 	): Promise<
-	| {
-		result: GenericExecuteOutputValue;
-		argumentRest: readonly string[];
-	}
-	| SymbolCommandError
+		| {
+			result: GenericValue;
+			argumentRest: readonly string[];
+		}
+		| SymbolCommandError
 	>;
 }
 
-export interface InitOptionExecuteParams {
-	isHere: boolean;
-	value: string | undefined;
+export interface CreateOptionInitParams {
+	description: string | null;
+	aliases: readonly string[];
 }
 
-export function initOption<
-	GenericName extends string,
-	GenericExecuteOutputValue extends unknown,
+export type CreateOptionInitRest<
+	GenericOption extends Option = Option,
+> = {
+	[Prop in Exclude<keyof GenericOption, keyof Option>]: GenericOption[Prop] extends DCommon.AnyFunction
+		? (self: GenericOption, ...args: Parameters<GenericOption[Prop]>) => ReturnType<GenericOption[Prop]>
+		: GenericOption[Prop]
+};
+
+export interface CreateOptionConstructorParams<
+	GenericKindHandler extends DKind.Handler = DKind.Handler,
+> {
+	init<
+		GenericOption extends (
+			& Option
+			& DKind.Kind<GenericKindHandler>
+		),
+	>(
+		name: GenericOption["name"],
+		execute: (
+			self: GenericOption,
+			value: string | undefined | null,
+			error: Error,
+		) => DCommon.MaybePromise<
+			| Extract<Awaited<ReturnType<GenericOption["execute"]>>, object>["result"]
+			| SymbolCommandError
+		>,
+		params: CreateOptionInitParams,
+		...args: DCommon.IsNever<Exclude<keyof GenericOption, keyof Option>> extends true
+			? []
+			: [rest: CreateOptionInitRest<GenericOption>]
+	): NoInfer<GenericOption>;
+}
+
+export function createOption<
+	GenericKindHandler extends DKind.Handler,
+	GenericConstructor extends (
+		(...args: any[]) => (
+			& Option
+			& DKind.Kind<GenericKindHandler>
+		)
+	),
 >(
-	name: GenericName,
-	execute: (
-		params: InitOptionExecuteParams,
-		error: CommandError,
-	) => MaybePromise<GenericExecuteOutputValue | SymbolCommandError>,
-	params?: {
-		description?: string;
-		aliases?: readonly string[];
-		hasValue?: boolean;
-	},
-) {
-	const self: Option<GenericName, GenericExecuteOutputValue> = optionKind.setTo({
-		name,
-		execute: async(
-			args: readonly string[],
-			error: CommandError,
+	kindHandler: GenericKindHandler,
+	createConstructor: (
+		params: CreateOptionConstructorParams<
+			GenericKindHandler
+		>,
+	) => GenericConstructor,
+): GenericConstructor;
+
+export function createOption(
+	kindHandler: DKind.Handler,
+	createConstructor: (
+		params: CreateOptionConstructorParams,
+	) => Option,
+): Option {
+	return createConstructor({
+		init: (
+			name,
+			execute,
+			params,
+			...rest
 		) => {
-			const result = DArray.reduce(
-				args,
-				DArray.reduceFrom(null),
-				({ element, next, exit, index }) => {
-					const extractResult = DString.extract(element, regexOption);
+			const self: Option = {
+				...Object.fromEntries(
+					Object
+						.entries(rest[0] ?? {})
+						.map(
+							([key, prop]) => typeof prop === "function"
+								? [key, (...args: never[]) => (prop as DCommon.AnyFunction)(self, ...args)]
+								: [key, prop],
+						),
+				),
+				name,
+				execute: async(
+					args: readonly string[],
+					error: Error,
+				) => {
+					const result = DArray.reduce(
+						args,
+						DArray.reduceFrom(null),
+						({ element, next, exit, index }) => {
+							const extractResult = DString.extract(element, regexOption);
 
-					if (!extractResult) {
-						return next(null);
-					}
+							if (!extractResult) {
+								return next(null);
+							}
 
-					const result = {
-						key: extractResult.namedGroups!.key!,
-						value: extractResult.namedGroups?.value,
-						index,
-					};
+							const result = {
+								key: extractResult.namedGroups!.key!,
+								value: extractResult.namedGroups?.value,
+								index,
+							};
 
-					if (self.name !== result.key && !DArray.includes(self.aliases, result.key)) {
-						return next(null);
-					}
+							if (self.name !== result.key && !DArray.includes(self.aliases, result.key)) {
+								return next(null);
+							}
 
-					return exit(result);
-				},
-			);
-
-			if (!result) {
-				const executeResult = await execute(
-					{
-						isHere: false,
-						value: undefined,
-					},
-					error,
-				);
-
-				if (executeResult === SymbolCommandError) {
-					return SymbolCommandError;
-				}
-
-				return {
-					result: executeResult,
-					argumentRest: args,
-				};
-			} else if (self.hasValue) {
-				const value = result.value ?? args[result.index + 1];
-				const isOption = DString.test(value ?? "", regexOption);
-
-				if (isOption) {
-					return addIssue(
-						error,
-						{
-							type: "option",
-							target: self.name,
-							expected: `value for option --${self.name}`,
-							received: value,
-							message: `Missing value for option "${self.name}": received another option token instead of a value.`,
+							return exit(result);
 						},
 					);
-				}
 
-				const executeResult = await execute(
-					{
-						isHere: true,
+					const { value, argumentRest } = DCommon.justExec(() => {
+						if (!result) {
+							return {
+								value: null,
+								argumentRest: args,
+							};
+						}
+
+						if (result.value === undefined) {
+							const nextArg = args[result.index + 1];
+
+							if (nextArg === undefined || DString.test(nextArg, regexOption)) {
+								return {
+									value: undefined,
+									argumentRest: DArray.spliceDelete(args, result.index, 1),
+								};
+							}
+
+							return {
+								value: nextArg,
+								argumentRest: DArray.spliceDelete(args, result.index, 2),
+							};
+						}
+
+						return {
+							value: result.value,
+							argumentRest: DArray.spliceDelete(args, result.index, 1),
+						};
+					});
+
+					const executeResult = await execute(
+						self as never,
 						value,
-					},
-					error,
-				);
+						error,
+					);
 
-				if (executeResult === SymbolCommandError) {
-					return SymbolCommandError;
-				}
+					if (executeResult === SymbolCommandError) {
+						return SymbolCommandError;
+					}
 
-				return {
-					result: executeResult,
-					argumentRest: DArray.spliceDelete(
-						args,
-						result.index,
-						result.value === undefined && args[result.index + 1] !== undefined
-							? 2
-							: 1,
-					),
-				};
-			} else if (!self.hasValue && result.value !== undefined) {
-				return addIssue(
-					error,
-					{
-						type: "option",
-						target: self.name,
-						expected: `option without value --${self.name}`,
-						received: result.value,
-						message: `Option "${self.name}" does not accept a value.`,
-					},
-				);
-			}
-
-			const executeResult = await execute(
-				{
-					isHere: true,
-					value: undefined,
+					return {
+						result: executeResult,
+						argumentRest,
+					};
 				},
-				error,
-			);
+				aliases: params?.aliases ?? [],
+				description: params?.description ?? null,
+				[optionKind.runTimeKey]: null,
+				[kindHandler.runTimeKey]: null,
+			} satisfies DKind.Remove<Option> as never;
 
-			if (executeResult === SymbolCommandError) {
-				return SymbolCommandError;
-			}
-
-			return {
-				result: executeResult,
-				argumentRest: DArray.spliceDelete(args, result.index, 1),
-			};
+			return self as never;
 		},
-		aliases: params?.aliases ?? [],
-		description: params?.description ?? null,
-		hasValue: params?.hasValue ?? false,
-	} satisfies RemoveKind<Option>);
-
-	return self;
+	});
 }

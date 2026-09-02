@@ -3,7 +3,7 @@ import * as DEither from "@duplojs/lang/either";
 import type * as DDP from "@duplojs/lang/dataParser";
 import { createKind } from "@scripts/kind";
 import type { EligibleSpec, EligibleSpecOutput } from "./types";
-import { addIssue, addIssueDataParser, type CommandError, type SymbolCommandError } from "./error";
+import { addIssue, addIssueDataStructure, type Error, type SymbolCommandError } from "./error";
 import { specToDataParser } from "./spec";
 
 export const argumentKind = createKind("command-argument");
@@ -19,7 +19,7 @@ export interface Argument<
 	readonly description?: string;
 	execute(
 		argument: string | undefined,
-		error: CommandError,
+		error: Error,
 	): Promise<
 		| GenericExecuteOutput
 		| SymbolCommandError
@@ -101,7 +101,7 @@ export function createArgument<
 					: dataParser.parse(argument);
 
 				if (DEither.isLeft(result)) {
-					return addIssueDataParser(
+					return addIssueDataStructure(
 						error,
 						unwrap(result),
 						{

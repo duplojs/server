@@ -5,7 +5,7 @@ import * as DObject from "@duplojs/lang/object";
 import { createKind } from "@scripts/kind";
 import { exitProcess } from "@scripts/common/exitProcess";
 import type { Option } from "./options";
-import { addIssue, SymbolCommandError, type CommandError } from "./error";
+import { addIssue, SymbolCommandError, type Error } from "./error";
 import { logCommandHelp, helpOption } from "./help";
 import { type Argument } from "./argument";
 import { type ForbiddenDuplicateName } from "./types";
@@ -35,7 +35,7 @@ export interface Command<
 	readonly description: string | null;
 	readonly subject: CommandSubject | null;
 	readonly options: readonly Option[];
-	execute(args: readonly string[], error: CommandError): Promise<undefined | SymbolCommandError>;
+	execute(args: readonly string[], error: Error): Promise<undefined | SymbolCommandError>;
 }
 
 export type Subjects = AnyTuple<Argument> | AnyTuple<Command>;

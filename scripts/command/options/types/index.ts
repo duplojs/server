@@ -1,2 +1,2 @@
-export * from "./computeOptionSpec";
-export * from "./options";
+export type * from "./eligibleType";
+export type * from "./options";

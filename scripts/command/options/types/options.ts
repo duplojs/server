@@ -1,12 +1,14 @@
-import type * as AllOption from "../";
+import { type Option } from "../base";
+import { type SimpleOption, type BooleanOption, type ArrayOption } from "../default";
 
-export interface CustomOption {
-	base: AllOption.Option;
+export interface OptionsStore {
+	base: Option;
+	boolean: BooleanOption;
+	simple: SimpleOption;
+	array: ArrayOption;
 }
 
-export type Options = (
-	| CustomOption[keyof CustomOption]
-	| AllOption.BooleanOption
-	| AllOption.SimpleOption
-	| AllOption.ArrayOption
-);
+export type Options = Extract<
+	OptionsStore[keyof OptionsStore],
+	Option
+>;

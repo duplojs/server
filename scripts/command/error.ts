@@ -1,121 +1,189 @@
-import { Printer } from "@duplojs/lang";
-import type * as DDP from "@duplojs/lang/dataParser";
+import * as DPrinter from "@duplojs/lang/printer";
+import * as DString from "@duplojs/lang/string";
+import * as DModeling from "@duplojs/lang/modeling";
+import type * as DDataStructure from "@duplojs/lang/dataStructure";
 
-export interface CommandErrorIssue {
-	readonly type: "argument" | "command" | "option";
-	readonly commandPath: readonly string[];
-	readonly target?: string;
-	readonly parserPath?: string;
-	readonly expected: string;
-	readonly received: unknown;
-	readonly message?: string;
+export interface OptionCommandIssueBase {
+	readonly data: unknown;
+	readonly path: string;
+	readonly optionName: string;
 }
 
-export interface CommandError {
-	readonly issues: CommandErrorIssue[];
-	readonly currentCommandPath: string[];
+export interface RequiredOptionCommandIssue extends OptionCommandIssueBase,
+	DModeling.ObjectTag<"RequiredOptionCommandIssue"> {}
+
+export interface RequiredOptionValueCommandIssue extends OptionCommandIssueBase,
+	DModeling.ObjectTag<"RequiredOptionValueCommandIssue"> {}
+
+export interface UnexpectedOptionValueCommandIssue extends OptionCommandIssueBase,
+	DModeling.ObjectTag<"UnexpectedOptionValueCommandIssue"> {}
+
+export interface DataStructureOptionCommandIssue extends OptionCommandIssueBase,
+	DModeling.ObjectTag<"DataStructureOptionCommandIssue"> {
+	readonly dataStructureError: DDataStructure.Error;
 }
+
+export type Issues = (
+	| RequiredOptionCommandIssue
+	| RequiredOptionValueCommandIssue
+	| UnexpectedOptionValueCommandIssue
+	| DataStructureOptionCommandIssue
+);
 
 export const SymbolCommandError = Symbol.for("SymbolCommandError");
 export type SymbolCommandError = typeof SymbolCommandError;
 
+export interface Error {
+	readonly issues: readonly Issues[];
+	readonly currentPath: readonly string[];
+	addRequiredOptionCommandIssue(
+		optionName: string,
+		data: unknown,
+	): SymbolCommandError;
+	addRequiredOptionValueCommandIssue(
+		optionName: string,
+	): SymbolCommandError;
+	addUnexpectedOptionValueCommandIssue(
+		optionName: string,
+		data: unknown,
+	): SymbolCommandError;
+	addDataStructureOptionCommandIssue(
+		optionName: string,
+		data: unknown,
+		dataStructureError: DDataStructure.Error,
+	): SymbolCommandError;
+}
+
 export function createError(
 	commandName: string,
-): CommandError {
+): Error {
+	const issues: Issues[] = [];
+	const currentPath = [commandName];
+
 	return {
-		issues: [],
-		currentCommandPath: [commandName],
+		issues,
+		currentPath,
+		addRequiredOptionCommandIssue: (
+			optionName,
+			data,
+		) => {
+			issues.push(
+				DModeling.taggedObject(
+					"RequiredOptionCommandIssue",
+					{
+						optionName,
+						data,
+						path: currentPath.join("."),
+					},
+				),
+			);
+
+			return SymbolCommandError;
+		},
+		addRequiredOptionValueCommandIssue: (
+			optionName,
+		) => {
+			issues.push(
+				DModeling.taggedObject(
+					"RequiredOptionValueCommandIssue",
+					{
+						optionName,
+						data: undefined,
+						path: currentPath.join("."),
+					},
+				),
+			);
+
+			return SymbolCommandError;
+		},
+		addUnexpectedOptionValueCommandIssue: (
+			optionName,
+			data,
+		) => {
+			issues.push(
+				DModeling.taggedObject(
+					"UnexpectedOptionValueCommandIssue",
+					{
+						optionName,
+						data,
+						path: currentPath.join("."),
+					},
+				),
+			);
+
+			return SymbolCommandError;
+		},
+		addDataStructureOptionCommandIssue: (
+			optionName,
+			data,
+			dataStructureError,
+		) => {
+			issues.push(
+				DModeling.taggedObject(
+					"DataStructureOptionCommandIssue",
+					{
+						optionName,
+						data,
+						dataStructureError,
+						path: currentPath.join("."),
+					},
+				),
+			);
+
+			return SymbolCommandError;
+		},
 	};
 }
 
-export function addIssue(
-	error: CommandError,
-	issue: Omit<CommandErrorIssue, "commandPath">,
-): SymbolCommandError {
-	error.issues.push(
-		{
-			...issue,
-			commandPath: [...error.currentCommandPath],
-		},
-	);
-
-	return SymbolCommandError;
-}
-
-export function addIssueDataParser(
-	error: CommandError,
-	parseError: DDP.DataParserError,
-	params: {
-		type: "argument" | "option";
-		target?: string;
-	},
-): SymbolCommandError {
-	for (const issue of parseError.issues) {
-		error.issues.push(
-			{
-				type: params.type,
-				commandPath: [...error.currentCommandPath],
-				target: params.target,
-				parserPath: issue.path || undefined,
-				expected: issue.expected,
-				received: issue.data,
-				message: issue.message,
-			},
-		);
-	}
-
-	return SymbolCommandError;
-}
-
 export function interpretCommandError(
-	error: CommandError,
+	error: Error,
 ): string {
-	return Printer.renderParagraph(
+	return DPrinter.renderParagraph(
 		[
-			Printer.render(
+			DPrinter.render(
 				[
-					Printer.colorizedBold("Command failed", "red"),
-					Printer.back,
-					Printer.indent(1),
-					Printer.colorizedBold("COMMAND: ", "cyan"),
-					error.issues[0]?.commandPath.join(" ") ?? error.currentCommandPath.join(" "),
+					DPrinter.colorizedBold("Command failed", "red"),
+					DPrinter.back,
+					DPrinter.indent(1),
+					DPrinter.colorizedBold("COMMAND: ", "cyan"),
+					error.issues[0]?.commandPath.join(" ") ?? error.currentPath.join(" "),
 				],
 				"",
 			),
 			error.issues.map(
-				(issue) => Printer.renderParagraph(
+				(issue) => DPrinter.renderParagraph(
 					[
 						issue.type === "option"
 						&& issue.target
-						&& Printer.render(
+						&& DPrinter.render(
 							[
-								Printer.indent(1),
-								Printer.colorizedBold("OPTION: ", "blue"),
+								DPrinter.indent(1),
+								DPrinter.colorizedBold("OPTION: ", "blue"),
 								`--${issue.target}`,
 							],
 							"",
 						),
 						issue.type === "argument"
 						&& issue.target
-						&& Printer.render(
+						&& DPrinter.render(
 							[
-								Printer.indent(1),
-								Printer.colorizedBold("ARGUMENT: ", "magenta"),
+								DPrinter.indent(1),
+								DPrinter.colorizedBold("ARGUMENT: ", "magenta"),
 								issue.target,
 							],
 							"",
 						),
-						Printer.renderLine(
+						DPrinter.renderLine(
 							[
-								Printer.colorizedBold("✖", "red"),
-								issue.parserPath && Printer.colorizedBold(issue.parserPath, "cyan"),
+								DPrinter.colorizedBold("✖", "red"),
+								issue.parserPath && DPrinter.colorizedBold(issue.parserPath, "cyan"),
 								"expected",
-								Printer.colorized(issue.expected, "green"),
+								DPrinter.colorized(issue.expected, "green"),
 								"but received",
-								Printer.colorized(Printer.stringify(issue.received), "red"),
+								DPrinter.colorized(DString.stringify(issue.received), "red"),
 							],
 						),
-						issue.message !== undefined && `${Printer.indent(1)}↳ ${issue.message}`,
+						issue.message !== undefined && `${DPrinter.indent(1)}↳ ${issue.message}`,
 					],
 				),
 			),
@@ -125,35 +193,35 @@ export function interpretCommandError(
 }
 
 export function interpretExecOptionError(
-	error: CommandError,
+	error: Error,
 ): string {
-	return Printer.renderParagraph(
+	return DPrinter.renderParagraph(
 		[
-			Printer.colorizedBold("Invalid options", "red"),
+			DPrinter.colorizedBold("Invalid options", "red"),
 			error.issues.map(
-				(issue) => Printer.renderParagraph(
+				(issue) => DPrinter.renderParagraph(
 					[
 						issue.type === "option"
 						&& issue.target
-						&& Printer.render(
+						&& DPrinter.render(
 							[
-								Printer.indent(1),
-								Printer.colorizedBold("OPTION: ", "blue"),
+								DPrinter.indent(1),
+								DPrinter.colorizedBold("OPTION: ", "blue"),
 								`--${issue.target}`,
 							],
 							"",
 						),
-						Printer.renderLine(
+						DPrinter.renderLine(
 							[
-								Printer.colorizedBold("✖", "red"),
-								issue.parserPath && Printer.colorizedBold(issue.parserPath, "cyan"),
+								DPrinter.colorizedBold("✖", "red"),
+								issue.parserPath && DPrinter.colorizedBold(issue.parserPath, "cyan"),
 								"expected",
-								Printer.colorized(issue.expected, "green"),
+								DPrinter.colorized(issue.expected, "green"),
 								"but received",
-								Printer.colorized(Printer.stringify(issue.received), "red"),
+								DPrinter.colorized(DString.stringify(issue.received), "red"),
 							],
 						),
-						issue.message !== undefined && `${Printer.indent(1)}↳ ${issue.message}`,
+						issue.message !== undefined && `${DPrinter.indent(1)}↳ ${issue.message}`,
 					],
 				),
 			),
