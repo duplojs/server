@@ -5,6 +5,7 @@ import * as DObject from "@duplojs/lang/object";
 import * as DArray from "@duplojs/lang/array";
 import type * as DPath from "@duplojs/lang/path";
 import type * as DServerFile from "@scripts/file";
+import * as DServerDataStructure from "@scripts/dataStructure";
 import { implementFunction } from "@scripts/implementor";
 import { parseEnvironmentFiles } from "./parseEnvironmentFiles";
 import { expandEnvironmentVariables } from "./expandEnvironmentVariables";
@@ -61,7 +62,7 @@ export const environmentVariable = implementFunction(
 
 			const schema = DDataStructure.object(shape);
 			const parsedEnvResult = await schema.asyncUnsafeDecode(
-				envFileParams?.codecs ?? DDataStructure.codecsString,
+				envFileParams?.codecs ?? DServerDataStructure.codecsString,
 				expandEnvResult,
 			);
 

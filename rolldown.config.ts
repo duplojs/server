@@ -3,7 +3,7 @@ import dts from "unplugin-dts/rolldown";
 
 export default defineConfig({
 	input: "scripts/index.ts",
-	external: ["@duplojs/lang"],
+	external: [/^@duplojs\/lang/],
 	platform: "browser",
 	tsconfig: "tsconfig.build.json",
 	output: [

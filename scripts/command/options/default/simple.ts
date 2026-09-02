@@ -1,7 +1,8 @@
 import type * as DCommon from "@duplojs/lang/common";
 import type * as DKind from "@duplojs/lang/kind";
 import * as DEither from "@duplojs/lang/either";
-import * as DDataStructure from "@duplojs/lang/dataStructure";
+import type * as DDataStructure from "@duplojs/lang/dataStructure";
+import * as DServerDataStructure from "@scripts/dataStructure";
 import { createOption, type Option } from "../base";
 import type { EligibleType } from "../types";
 import { createKind } from "@scripts/kind";
@@ -69,7 +70,7 @@ export const createSimpleOption = createOption(
 			}
 
 			const result = await self.dataStructure.asyncUnsafeDecode(
-				DDataStructure.codecsString,
+				DServerDataStructure.codecsString,
 				value,
 			);
 

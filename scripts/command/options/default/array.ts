@@ -1,13 +1,13 @@
 import * as DCommon from "@duplojs/lang/common";
 import type * as DKind from "@duplojs/lang/kind";
 import * as DDataStructure from "@duplojs/lang/dataStructure";
-import * as DString from "@duplojs/lang/string";
 import type * as DNumber from "@duplojs/lang/number";
 import type * as DArray from "@duplojs/lang/array";
 import * as DEither from "@duplojs/lang/either";
+import * as DServerDataStructure from "@scripts/dataStructure";
 import { createOption, type Option } from "../base";
 import type { EligibleType } from "../types";
-import { createKind } from "@scripts/kind";
+import { createKind } from "../../../kind";
 
 const defaultSeparator = ",";
 
@@ -92,7 +92,7 @@ export const createArrayOption = createOption(
 			}
 
 			const result = await self.dataStructure.asyncUnsafeDecode(
-				DDataStructure.codecsString,
+				DServerDataStructure.codecsString,
 				value,
 			);
 
