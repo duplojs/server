@@ -1,18 +1,18 @@
-import { type Kind, type AnyFunction, type RemoveKind, type MaybePromise, type AnyTuple, justExec, type ComputedTypeError, type IsEqual, type And, type Not, type UnionContain, type NeverCoalescing } from "@duplojs/lang";
+import * as DCommon from "@duplojs/lang/common";
+import type * as DKind from "@duplojs/lang/kind";
 import * as DArray from "@duplojs/lang/array";
 import * as DGenerator from "@duplojs/lang/generator";
 import * as DObject from "@duplojs/lang/object";
-import { createKind } from "@scripts/kind";
-import { exitProcess } from "@scripts/common/exitProcess";
+import { createKind } from "../kind";
 import type { Option } from "./options";
-import { addIssue, SymbolCommandError, type Error } from "./error";
+import { SymbolCommandError, type Error } from "./error";
 import { logCommandHelp, helpOption } from "./help";
 import { type Argument } from "./argument";
 import { type ForbiddenDuplicateName } from "./types";
 
 const commandKind = createKind("command");
 
-export function isCommands(input: unknown): input is AnyTuple<Command> {
+export function isCommands(input: unknown): input is DCommon.AnyTuple<Command> {
 	return input instanceof Array
 		? input.every(commandKind.has)
 		: false;
@@ -28,8 +28,8 @@ type CommandSubject = {
 
 export interface Command<
 	GenericName extends string = string,
-> extends Kind<
-	typeof commandKind.definition
+> extends DKind.Kind<
+	typeof commandKind
 	> {
 	readonly name: GenericName;
 	readonly description: string | null;
@@ -38,7 +38,10 @@ export interface Command<
 	execute(args: readonly string[], error: Error): Promise<undefined | SymbolCommandError>;
 }
 
-export type Subjects = AnyTuple<Argument> | AnyTuple<Command>;
+export type Subjects = (
+	| DCommon.AnyTuple<Argument>
+	| DCommon.AnyTuple<Command>
+);
 
 export type ForbiddenBadOrderArguments<
 	GenericSubject extends readonly Subjects[number][],
@@ -47,49 +50,36 @@ export type ForbiddenBadOrderArguments<
 	Argument<string, infer InferredValue>,
 	...infer InferredRest extends Argument[],
 ]
-	? And<[
-		IsEqual<GenericContainOptional, true>,
-		Not<UnionContain<InferredValue, undefined>>,
+	? DCommon.And<[
+		DCommon.IsEqual<GenericContainOptional, true>,
+		DCommon.Not<DCommon.UnionContain<InferredValue, undefined>>,
 	]> extends true
-		? ComputedTypeError<"Optional argument can't be define before required argument">
-		: ForbiddenBadOrderArguments<InferredRest, UnionContain<InferredValue, undefined>>
+		? DCommon.ComputedTypeError<"Optional argument can't be define before required argument">
+		: ForbiddenBadOrderArguments<InferredRest, DCommon.UnionContain<InferredValue, undefined>>
 	: unknown;
 
 export interface CreateCommandParams<
-	GenericOptions extends AnyTuple<Option> = AnyTuple<Option>,
+	GenericOptions extends DCommon.AnyTuple<Option> = DCommon.AnyTuple<Option>,
 	GenericSubject extends Subjects = Subjects,
 > {
-	description?: string;
-	options?: (
+	readonly description?: string;
+	readonly options?: (
 		& GenericOptions
 		& ForbiddenDuplicateName<GenericOptions, "option">
 	);
-
-	/**
-	 * {@include command/create/properties/subjects.md}
-	 */
-	subjects?: (
+	readonly subjects?: (
 		& GenericSubject
-		& (
-			Extract<
-				(
-					| [ForbiddenDuplicateName<GenericSubject, "subject">]
-					| [ForbiddenBadOrderArguments<GenericSubject>]
-				),
-				[ComputedTypeError<string>]
-			> extends [infer InferredResult]
-				? NeverCoalescing<InferredResult, unknown>
-				: unknown
-		)
+		& ForbiddenDuplicateName<GenericSubject, "subject">
+		& ForbiddenBadOrderArguments<GenericSubject>
 	);
 }
 
 export type CreateCommandExecuteParams<
-	GenericOptions extends AnyTuple<Option>,
-	GenericArguments extends AnyTuple<Argument>,
+	GenericOptions extends DCommon.AnyTuple<Option>,
+	GenericArguments extends DCommon.AnyTuple<Argument>,
 > = (
 	& (
-		IsEqual<GenericOptions, never> extends true
+		DCommon.IsEqual<GenericOptions, never> extends true
 			? {}
 			: {
 				options: {
@@ -103,7 +93,7 @@ export type CreateCommandExecuteParams<
 			}
 	)
 	& (
-		IsEqual<GenericArguments, never> extends true
+		DCommon.IsEqual<GenericArguments, never> extends true
 			? {}
 			: {
 				args: {
@@ -127,7 +117,7 @@ export function create<
 
 export function create<
 	GenericName extends string,
-	const GenericOptions extends AnyTuple<Option> = never,
+	const GenericOptions extends DCommon.AnyTuple<Option> = never,
 	GenericSubjects extends Subjects = never,
 >(
 	name: GenericName,
@@ -138,173 +128,153 @@ export function create<
 	execute: (
 		params: CreateCommandExecuteParams<
 			GenericOptions,
-			Extract<GenericSubjects, AnyTuple<Argument>>
+			Extract<GenericSubjects, DCommon.AnyTuple<Argument>>
 		>,
-	) => MaybePromise<void>,
+	) => DCommon.MaybePromise<void>,
 ): Command<GenericName>;
 
 export function create(
-	...args: [string, AnyFunction] | [
+	...args: [string, DCommon.AnyFunction] | [
 		string,
 		CreateCommandParams<
-			AnyTuple<Option>,
+			DCommon.AnyTuple<Option>,
 			Subjects
 		>,
-		AnyFunction,
+		DCommon.AnyFunction,
 	]
 ): Command {
 	const [name, params, execute] = args.length === 2
 		? [args[0], {}, args[1]]
 		: args;
 
-	const self: Command = commandKind.setTo(
-		{
-			name,
-			description: params.description ?? null,
-			options: params.options ?? [],
-			subject: justExec((): CommandSubject | null => {
-				if (isCommands(params.subjects)) {
-					return {
-						type: "subCommand",
-						subCommands: params.subjects,
-					};
-				} else if (params.subjects) {
-					return {
-						type: "argument",
-						args: params.subjects,
-					};
-				}
+	const self: Command = {
+		name,
+		description: params.description ?? null,
+		options: params.options ?? [],
+		subject: DCommon.justExec((): CommandSubject | null => {
+			if (isCommands(params.subjects)) {
+				return {
+					type: "subCommand",
+					subCommands: params.subjects,
+				};
+			} else if (params.subjects) {
+				return {
+					type: "argument",
+					args: params.subjects,
+				};
+			}
 
-				return null;
-			}),
-			execute: async(args, error) => {
-				if (self.subject?.type === "subCommand") {
-					for (const command of self.subject.subCommands) {
-						if (args[0] === command.name) {
-							error.currentCommandPath[
-								error.currentCommandPath.length
-							] = command.name;
-							return command.execute(DArray.shift(args), error);
-						}
+			return null;
+		}),
+		execute: async(args, error) => {
+			if (self.subject?.type === "subCommand") {
+				for (const command of self.subject.subCommands) {
+					if (args[0] === command.name) {
+						error.pushPath(command.name);
+						return command.execute(DArray.shift(args), error);
 					}
 				}
+			}
 
-				const help = await helpOption.execute(args, error);
+			const help = await helpOption.execute(args, error);
 
-				if (help === SymbolCommandError) {
-					return SymbolCommandError;
-				} else if (help.result) {
-					logCommandHelp(self);
-					return void exitProcess(0);
+			if (help === SymbolCommandError) {
+				return SymbolCommandError;
+			} else if (help.result) {
+				logCommandHelp(self);
+				return;
+			}
+
+			const commandOptions = await DGenerator.asyncReduce(
+				self.options,
+				DGenerator.reduceFrom<{
+					options: Record<string, unknown>;
+					restArgs: readonly string[];
+				}>({
+					options: {},
+					restArgs: args,
+				}),
+				async({ item: option, lastValue, next, exit }) => {
+					const optionResult = await option.execute(lastValue.restArgs, error);
+
+					if (optionResult === SymbolCommandError) {
+						return exit(SymbolCommandError);
+					}
+
+					return next({
+						options: DObject.override(
+							lastValue.options,
+							{
+								[option.name]: optionResult.result,
+							},
+						),
+						restArgs: optionResult.argumentRest,
+					});
+				},
+			);
+
+			if (commandOptions === SymbolCommandError) {
+				return SymbolCommandError;
+			}
+
+			if (self.subject?.type === "argument") {
+				if (self.subject.args.length !== commandOptions.restArgs.length) {
+					return error.addTooMuchCommandArgumentIssue(
+						self.subject.args.length,
+						commandOptions.restArgs.length,
+					);
 				}
 
-				const commandOptions = await DGenerator.asyncReduce(
-					self.options,
+				const commandArguments = await DGenerator.asyncReduce(
+					self.subject.args,
 					DGenerator.reduceFrom<{
-						options: Record<string, unknown>;
+						args: Record<string, unknown>;
 						restArgs: readonly string[];
 					}>({
-						options: {},
-						restArgs: args,
+						args: {},
+						restArgs: commandOptions.restArgs,
 					}),
-					async({ element: option, lastValue, next, exit }) => {
-						const optionResult = await option.execute(lastValue.restArgs, error);
+					async({ item: argument, lastValue, next, exit }) => {
+						const firstArgument = DArray.first(lastValue.restArgs);
 
-						if (optionResult === SymbolCommandError) {
+						const argumentResult = await argument.execute(firstArgument, error);
+
+						if (argumentResult === SymbolCommandError) {
 							return exit(SymbolCommandError);
 						}
 
 						return next({
-							options: DObject.override(
-								lastValue.options,
-								{
-									[option.name]: optionResult.result,
-								},
+							args: DObject.override(
+								lastValue.args,
+								{ [argument.name]: argumentResult },
 							),
-							restArgs: optionResult.argumentRest,
+							restArgs: DArray.shift(lastValue.restArgs),
 						});
 					},
 				);
 
-				if (commandOptions === SymbolCommandError) {
+				if (commandArguments === SymbolCommandError) {
 					return SymbolCommandError;
 				}
 
-				if (self.subject?.type === "argument") {
-					if (self.subject.args.length !== commandOptions.restArgs.length) {
-						const expectedCount = self.subject.args.length;
-						const receivedCount = commandOptions.restArgs.length;
-
-						addIssue(
-							error,
-							{
-								type: "command",
-								expected: `${expectedCount} declared argument${expectedCount > 1 ? "s" : ""}`,
-								received: commandOptions.restArgs,
-								message: `Declared arguments count does not match received arguments count: expected ${expectedCount}, received ${receivedCount}.`,
-							},
-						);
-
-						return SymbolCommandError;
-					}
-
-					const commandArguments = await DGenerator.asyncReduce(
-						self.subject.args,
-						DGenerator.reduceFrom<{
-							args: Record<string, unknown>;
-							restArgs: readonly string[];
-						}>({
-							args: {},
-							restArgs: commandOptions.restArgs,
-						}),
-						async({ element: argument, lastValue, next, exit }) => {
-							const firstArgument = DArray.first(lastValue.restArgs);
-
-							const argumentResult = await argument.execute(firstArgument, error);
-
-							if (argumentResult === SymbolCommandError) {
-								return exit(SymbolCommandError);
-							}
-
-							return next({
-								args: DObject.override(
-									lastValue.args,
-									{ [argument.name]: argumentResult },
-								),
-								restArgs: DArray.shift(lastValue.restArgs),
-							});
-						},
+				await execute({
+					options: commandOptions.options,
+					args: commandArguments.args,
+				});
+			} else {
+				if (commandOptions.restArgs.length > 0) {
+					return error.addTooMuchCommandArgumentIssue(
+						0,
+						commandOptions.restArgs.length,
 					);
-
-					if (commandArguments === SymbolCommandError) {
-						return SymbolCommandError;
-					}
-
-					await execute({
-						options: commandOptions.options,
-						args: commandArguments.args,
-					});
-				} else {
-					if (commandOptions.restArgs.length > 0) {
-						addIssue(
-							error,
-							{
-								type: "command",
-								expected: "existing child command",
-								received: commandOptions.restArgs[0],
-								message: `Unknown child command "${commandOptions.restArgs[0]}".`,
-							},
-						);
-						return SymbolCommandError;
-					}
-
-					await execute({ options: commandOptions.options });
 				}
 
-				return;
-			},
-		} satisfies RemoveKind<Command>,
-	);
+				await execute({ options: commandOptions.options });
+			}
+
+			return;
+		},
+	} satisfies DKind.Remove<Command> as never;
 
 	return self;
 }

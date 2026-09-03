@@ -4,7 +4,7 @@ import * as DEither from "@duplojs/lang/either";
 import type * as DDataStructure from "@duplojs/lang/dataStructure";
 import * as DServerDataStructure from "@scripts/dataStructure";
 import { createOption, type Option } from "../base";
-import type { EligibleType } from "../types";
+import type { EligibleType } from "../../types";
 import { createKind } from "@scripts/kind";
 
 export const simpleOptionKind = createKind("command-simple-option");
@@ -33,11 +33,12 @@ export const createSimpleOption = createOption(
 	simpleOptionKind,
 	({ init }) => <
 		GenericName extends string,
-		GenericValue extends EligibleType,
+		GenericStructure extends DDataStructure.Structure<EligibleType>,
+		GenericValue extends DDataStructure.StructureValue<GenericStructure>,
 		const GenericParams extends CreateSimpleOptionParams = {},
 	>(
 		name: GenericName,
-		dataStructure: DDataStructure.Structure<GenericValue>,
+		dataStructure: GenericStructure,
 		params: GenericParams,
 	): SimpleOption<
 		GenericName,
@@ -55,7 +56,6 @@ export const createSimpleOption = createOption(
 			if (value === null && self.required === true) {
 				return error.addRequiredOptionCommandIssue(
 					self.name,
-					undefined,
 				);
 			}
 

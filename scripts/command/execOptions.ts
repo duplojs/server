@@ -1,15 +1,16 @@
-import type { AnyTuple, SimplifyTopLevel } from "@duplojs/lang";
+import type * as DCommon from "@duplojs/lang/common";
+import * as DEither from "@duplojs/lang/either";
 import * as DGenerator from "@duplojs/lang/generator";
 import * as DObject from "@duplojs/lang/object";
-import { createError, interpretExecOptionError, SymbolCommandError } from "./error";
+import * as DServerCommon from "@scripts/common";
+import { createError, interpretExecOptionError, SymbolCommandError, type Error } from "./error";
 import { logExecOptionHelp, helpOption } from "./help";
 import type { Option } from "./options";
-import { exitProcess, getProcessArguments } from "@scripts/common";
 import type { ForbiddenDuplicateName } from "./types";
 
 type ComputeResult<
-	GenericOptions extends AnyTuple<Option>,
-> = SimplifyTopLevel<{
+	GenericOptions extends DCommon.AnyTuple<Option>,
+> = DCommon.SimplifyTopLevel<{
 	[GenericOption in GenericOptions[number] as GenericOption extends Option<infer GenericName, unknown>
 		? GenericName
 		: never
@@ -19,25 +20,37 @@ type ComputeResult<
 }>;
 
 export function execOptions<
-	GenericOptions extends AnyTuple<Option>,
+	GenericOptions extends DCommon.AnyTuple<Option>,
 >(
-	...options: GenericOptions & ForbiddenDuplicateName<GenericOptions, "option">
-): Promise<ComputeResult<GenericOptions>>;
+	...options: (
+		& GenericOptions
+		& ForbiddenDuplicateName<GenericOptions, "option">
+	)
+): Promise<
+	| DEither.Success<
+		Extract<
+			ComputeResult<GenericOptions>,
+			any
+		>
+	>
+	| DEither.Right<"log-help">
+	| DEither.Error<Error>
+>;
 
 export async function execOptions(
-	...options: AnyTuple<Option>
+	...options: DCommon.AnyTuple<Option>
 ) {
-	const processArguments = getProcessArguments();
+	const processArguments = DServerCommon.getProcessArguments();
 	const error = createError("root");
 	const help = await helpOption.execute(processArguments, error);
 
 	if (help === SymbolCommandError) {
 		// eslint-disable-next-line no-console
 		console.error(interpretExecOptionError(error));
-		return void exitProcess(1);
+		return DEither.error(error);
 	} else if (help.result) {
 		logExecOptionHelp(options);
-		return void exitProcess(0);
+		return DEither.right("log-help");
 	}
 
 	const result = await DGenerator.asyncReduce(
@@ -49,7 +62,7 @@ export async function execOptions(
 			options: {},
 			restArgs: processArguments,
 		}),
-		async({ element: option, lastValue, next, exit }) => {
+		async({ item: option, lastValue, next, exit }) => {
 			const optionResult = await option.execute(lastValue.restArgs, error);
 
 			if (optionResult === SymbolCommandError) {
@@ -71,8 +84,8 @@ export async function execOptions(
 	if (result === SymbolCommandError) {
 		// eslint-disable-next-line no-console
 		console.error(interpretExecOptionError(error));
-		return void exitProcess(1);
+		return DEither.error(error);
 	}
 
-	return result.options;
+	return DEither.success(result.options);
 }

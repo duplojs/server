@@ -1,120 +1,95 @@
-import { type RemoveKind, type Kind, unwrap } from "@duplojs/lang";
+import type * as DCommon from "@duplojs/lang/common";
+import type * as DKind from "@duplojs/lang/kind";
 import * as DEither from "@duplojs/lang/either";
-import type * as DDP from "@duplojs/lang/dataParser";
+import type * as DDataStructure from "@duplojs/lang/dataStructure";
+import * as DServerDataStructure from "@scripts/dataStructure";
 import { createKind } from "@scripts/kind";
-import type { EligibleSpec, EligibleSpecOutput } from "./types";
-import { addIssue, addIssueDataStructure, type Error, type SymbolCommandError } from "./error";
-import { specToDataParser } from "./spec";
+import { type Error, type SymbolCommandError } from "./error";
+import { type EligibleType } from "./types";
 
 export const argumentKind = createKind("command-argument");
 
 export interface Argument<
 	GenericName extends string = string,
-	GenericExecuteOutput extends unknown = unknown,
-> extends Kind<typeof argumentKind.definition> {
+	GenericValue extends EligibleType = EligibleType,
+> extends DKind.Kind<typeof argumentKind> {
 	readonly name: GenericName;
-	readonly spec: EligibleSpec;
-	readonly dataParser: DDP.DataParser;
+	readonly dataStructure: DDataStructure.Structure<GenericValue>;
 	readonly optional: boolean;
-	readonly description?: string;
+	readonly description: string | null;
 	execute(
 		argument: string | undefined,
 		error: Error,
 	): Promise<
-		| GenericExecuteOutput
+		| GenericValue
 		| SymbolCommandError
 	>;
 }
 
-export function createArgument<
-	GenericName extends string,
-	GenericEligibleSpec extends EligibleSpec,
->(
-	name: GenericName,
-	spec: GenericEligibleSpec,
-	params?: {
-		readonly description?: string;
-
-		/**
-		 * {@include command/createArgument/properties/optional.md}
-		 */
-		readonly optional?: false;
-	},
-): Argument<GenericName, EligibleSpecOutput<GenericEligibleSpec>>;
+export interface CreateArgumentParams {
+	readonly description?: string;
+	readonly optional?: boolean;
+}
 
 export function createArgument<
 	GenericName extends string,
-	GenericEligibleSpec extends EligibleSpec,
+	GenericStructure extends DDataStructure.Structure<EligibleType>,
+	GenericValue extends DDataStructure.StructureValue<GenericStructure>,
+	const GenericParams extends CreateArgumentParams = {},
 >(
 	name: GenericName,
-	spec: GenericEligibleSpec,
-	params?: {
-		readonly description?: string;
+	dataStructure: GenericStructure,
+	params?: GenericParams,
+): Argument<
+	GenericName,
+	(
+		| GenericValue
+		| (
+			DCommon.IsEqual<GenericParams["optional"], true> extends true
+				? undefined
+				: never
+		)
+	)
+>;
 
-		/**
-		 * {@include command/createArgument/properties/optional.md}
-		 */
-		readonly optional: boolean;
-	},
-): Argument<GenericName, EligibleSpecOutput<GenericEligibleSpec> | undefined>;
-
-export function createArgument<
-	GenericName extends string,
-	GenericEligibleSpec extends EligibleSpec,
->(
-	name: GenericName,
-	spec: GenericEligibleSpec,
-	params?: {
-		readonly description?: string;
-		readonly optional?: boolean;
-	},
+export function createArgument(
+	name: string,
+	dataStructure: DDataStructure.Structure<EligibleType>,
+	params?: CreateArgumentParams,
 ): any {
-	const dataParser = specToDataParser(spec);
+	const self: Argument = {
+		name,
+		dataStructure,
+		description: params?.description ?? null,
+		optional: params?.optional ?? false,
+		execute: async(argument, error) => {
+			if (self.optional === false && argument === undefined) {
+				return error.addRequiredArgumentCommandIssue(
+					self.name,
+				);
+			}
 
-	const self = argumentKind.setTo(
-		{
-			name,
-			spec,
-			dataParser,
-			description: params?.description,
-			optional: params?.optional ?? false,
-			execute: async(argument, error) => {
-				if (self.optional === false && argument === undefined) {
-					return addIssue(
-						error,
-						{
-							type: "argument",
-							target: name,
-							expected: `required argument ${name}`,
-							received: argument,
-							message: `Argument "${name}" is required.`,
-						},
-					);
-				}
+			if (argument === undefined) {
+				return undefined;
+			}
 
-				if (self.optional === true && argument === undefined) {
-					return undefined;
-				}
+			const result = await self.dataStructure.asyncDecode(
+				DServerDataStructure.codecsString,
+				argument,
+			);
 
-				const result = dataParser.isAsynchronous()
-					? await dataParser.asyncParse(argument)
-					: dataParser.parse(argument);
+			if (DEither.isLeft(result)) {
+				return error.addDataStructureArgumentCommandIssue(
+					self.name,
+					argument,
+					DEither.unwrapLeft(result),
+				);
+			}
 
-				if (DEither.isLeft(result)) {
-					return addIssueDataStructure(
-						error,
-						unwrap(result),
-						{
-							type: "argument",
-							target: name,
-						},
-					);
-				}
-
-				return unwrap(result);
-			},
-		} satisfies RemoveKind<Argument<string, unknown>>,
-	);
+			return DEither.unwrapRight(result);
+		},
+		[argumentKind.runTimeKey]: null,
+	} satisfies DKind.Remove<Argument> as never;
 
 	return self;
 }

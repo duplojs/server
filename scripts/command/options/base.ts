@@ -126,7 +126,13 @@ export function createOption(
 								index,
 							};
 
-							if (self.name !== result.key && !DArray.includes(self.aliases, result.key)) {
+							if (
+								self.name !== result.key
+								&& (
+									!DArray.includes(self.aliases, result.key)
+									|| extractResult.namedGroups?.dashes !== "--"
+								)
+							) {
 								return next(null);
 							}
 

@@ -3,31 +3,58 @@ import * as DString from "@duplojs/lang/string";
 import * as DModeling from "@duplojs/lang/modeling";
 import type * as DDataStructure from "@duplojs/lang/dataStructure";
 
-export interface OptionCommandIssueBase {
+export interface OptionIssueBase {
 	readonly data: unknown;
 	readonly path: string;
 	readonly optionName: string;
 }
 
-export interface RequiredOptionCommandIssue extends OptionCommandIssueBase,
-	DModeling.ObjectTag<"RequiredOptionCommandIssue"> {}
+export interface RequiredOptionIssue extends OptionIssueBase,
+	DModeling.ObjectTag<"RequiredOptionIssue"> {}
 
-export interface RequiredOptionValueCommandIssue extends OptionCommandIssueBase,
-	DModeling.ObjectTag<"RequiredOptionValueCommandIssue"> {}
+export interface RequiredOptionValueIssue extends OptionIssueBase,
+	DModeling.ObjectTag<"RequiredOptionValueIssue"> {}
 
-export interface UnexpectedOptionValueCommandIssue extends OptionCommandIssueBase,
-	DModeling.ObjectTag<"UnexpectedOptionValueCommandIssue"> {}
+export interface UnexpectedOptionValueIssue extends OptionIssueBase,
+	DModeling.ObjectTag<"UnexpectedOptionValueIssue"> {}
 
-export interface DataStructureOptionCommandIssue extends OptionCommandIssueBase,
-	DModeling.ObjectTag<"DataStructureOptionCommandIssue"> {
+export interface DataStructureOptionIssue extends OptionIssueBase,
+	DModeling.ObjectTag<"DataStructureOptionIssue"> {
 	readonly dataStructureError: DDataStructure.Error;
 }
 
+export interface ArgumentIssueBase {
+	readonly data: unknown;
+	readonly path: string;
+	readonly argumentName: string;
+}
+
+export interface RequiredArgumentIssue extends ArgumentIssueBase,
+	DModeling.ObjectTag<"RequiredArgumentIssue"> {}
+
+export interface DataStructureArgumentIssue extends ArgumentIssueBase,
+	DModeling.ObjectTag<"DataStructureArgumentIssue"> {
+	readonly dataStructureError: DDataStructure.Error;
+}
+
+export interface CommandArgumentIssueBase {
+	readonly path: string;
+}
+
+export interface TooMuchCommandArgumentIssue extends CommandArgumentIssueBase,
+	DModeling.ObjectTag<"TooMuchCommandArgumentIssue"> {
+	readonly expect: number;
+	readonly receive: number;
+}
+
 export type Issues = (
-	| RequiredOptionCommandIssue
-	| RequiredOptionValueCommandIssue
-	| UnexpectedOptionValueCommandIssue
-	| DataStructureOptionCommandIssue
+	| RequiredOptionIssue
+	| RequiredOptionValueIssue
+	| UnexpectedOptionValueIssue
+	| DataStructureOptionIssue
+	| RequiredArgumentIssue
+	| DataStructureArgumentIssue
+	| TooMuchCommandArgumentIssue
 );
 
 export const SymbolCommandError = Symbol.for("SymbolCommandError");
@@ -36,21 +63,33 @@ export type SymbolCommandError = typeof SymbolCommandError;
 export interface Error {
 	readonly issues: readonly Issues[];
 	readonly currentPath: readonly string[];
-	addRequiredOptionCommandIssue(
+	pushPath(path: string): void;
+	addRequiredOptionIssue(
+		optionName: string,
+	): SymbolCommandError;
+	addRequiredOptionValueIssue(
+		optionName: string,
+	): SymbolCommandError;
+	addUnexpectedOptionValueIssue(
 		optionName: string,
 		data: unknown,
 	): SymbolCommandError;
-	addRequiredOptionValueCommandIssue(
-		optionName: string,
-	): SymbolCommandError;
-	addUnexpectedOptionValueCommandIssue(
-		optionName: string,
-		data: unknown,
-	): SymbolCommandError;
-	addDataStructureOptionCommandIssue(
+	addDataStructureOptionIssue(
 		optionName: string,
 		data: unknown,
 		dataStructureError: DDataStructure.Error,
+	): SymbolCommandError;
+	addRequiredArgumentIssue(
+		argumentName: string,
+	): SymbolCommandError;
+	addDataStructureArgumentIssue(
+		argumentName: string,
+		data: unknown,
+		dataStructureError: DDataStructure.Error,
+	): SymbolCommandError;
+	addTooMuchCommandArgumentIssue(
+		expect: number,
+		receive: number,
 	): SymbolCommandError;
 }
 
@@ -63,29 +102,13 @@ export function createError(
 	return {
 		issues,
 		currentPath,
-		addRequiredOptionCommandIssue: (
-			optionName,
-			data,
-		) => {
-			issues.push(
-				DModeling.taggedObject(
-					"RequiredOptionCommandIssue",
-					{
-						optionName,
-						data,
-						path: currentPath.join("."),
-					},
-				),
-			);
-
-			return SymbolCommandError;
-		},
-		addRequiredOptionValueCommandIssue: (
+		pushPath: (path) => void currentPath.push(path),
+		addRequiredOptionIssue: (
 			optionName,
 		) => {
 			issues.push(
 				DModeling.taggedObject(
-					"RequiredOptionValueCommandIssue",
+					"RequiredOptionIssue",
 					{
 						optionName,
 						data: undefined,
@@ -96,13 +119,29 @@ export function createError(
 
 			return SymbolCommandError;
 		},
-		addUnexpectedOptionValueCommandIssue: (
+		addRequiredOptionValueIssue: (
+			optionName,
+		) => {
+			issues.push(
+				DModeling.taggedObject(
+					"RequiredOptionValueIssue",
+					{
+						optionName,
+						data: undefined,
+						path: currentPath.join("."),
+					},
+				),
+			);
+
+			return SymbolCommandError;
+		},
+		addUnexpectedOptionValueIssue: (
 			optionName,
 			data,
 		) => {
 			issues.push(
 				DModeling.taggedObject(
-					"UnexpectedOptionValueCommandIssue",
+					"UnexpectedOptionValueIssue",
 					{
 						optionName,
 						data,
@@ -113,18 +152,70 @@ export function createError(
 
 			return SymbolCommandError;
 		},
-		addDataStructureOptionCommandIssue: (
+		addDataStructureOptionIssue: (
 			optionName,
 			data,
 			dataStructureError,
 		) => {
 			issues.push(
 				DModeling.taggedObject(
-					"DataStructureOptionCommandIssue",
+					"DataStructureOptionIssue",
 					{
 						optionName,
 						data,
 						dataStructureError,
+						path: currentPath.join("."),
+					},
+				),
+			);
+
+			return SymbolCommandError;
+		},
+		addRequiredArgumentIssue: (
+			argumentName,
+		) => {
+			issues.push(
+				DModeling.taggedObject(
+					"RequiredArgumentIssue",
+					{
+						argumentName,
+						data: undefined,
+						path: currentPath.join("."),
+					},
+				),
+			);
+
+			return SymbolCommandError;
+		},
+		addDataStructureArgumentIssue: (
+			argumentName,
+			data,
+			dataStructureError,
+		) => {
+			issues.push(
+				DModeling.taggedObject(
+					"DataStructureArgumentIssue",
+					{
+						argumentName,
+						data,
+						dataStructureError,
+						path: currentPath.join("."),
+					},
+				),
+			);
+
+			return SymbolCommandError;
+		},
+		addTooMuchCommandArgumentIssue: (
+			expect,
+			receive,
+		) => {
+			issues.push(
+				DModeling.taggedObject(
+					"TooMuchCommandArgumentIssue",
+					{
+						expect,
+						receive,
 						path: currentPath.join("."),
 					},
 				),
@@ -146,7 +237,7 @@ export function interpretCommandError(
 					DPrinter.back,
 					DPrinter.indent(1),
 					DPrinter.colorizedBold("COMMAND: ", "cyan"),
-					error.issues[0]?.commandPath.join(" ") ?? error.currentPath.join(" "),
+					DString.join(error.currentPath, " "),
 				],
 				"",
 			),

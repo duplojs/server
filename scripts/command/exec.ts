@@ -1,32 +1,30 @@
-import type { AnyFunction, AnyTuple, MaybePromise } from "@duplojs/lang";
-import { exitProcess, getProcessArguments } from "@scripts/common";
+import type * as DCommon from "@duplojs/lang/common";
+import * as DEither from "@duplojs/lang/either";
+import * as DServerCommon from "@scripts/common";
 import { type CreateCommandExecuteParams, type CreateCommandParams, type Subjects, create } from "./create";
-import { createError, interpretCommandError, SymbolCommandError } from "./error";
+import { createError, interpretCommandError, SymbolCommandError, type Error } from "./error";
 import type { Option } from "./options";
 import type { Argument } from "./argument";
 
-export type ExecCommandParams<
-	GenericOptions extends AnyTuple<Option> = AnyTuple<Option>,
+export interface ExecCommandParams<
+	GenericOptions extends DCommon.AnyTuple<Option> = DCommon.AnyTuple<Option>,
 	GenericSubjects extends Subjects = Subjects,
-> = (
-	& CreateCommandParams<
+> extends CreateCommandParams<
 		GenericOptions,
 		GenericSubjects
-	> & {
-
-		/**
-		 * {@include command/exec/properties/displayName.md}
-		 */
-		displayName?: string;
-	}
-);
+	> {
+	displayName?: string;
+}
 
 export function exec(
 	execute: () => void,
-): Promise<void>;
+): Promise<
+	| DEither.Ok
+	| DEither.Error<Error>
+>;
 
 export function exec<
-	const GenericOptions extends AnyTuple<Option> = never,
+	const GenericOptions extends DCommon.AnyTuple<Option> = never,
 	GenericSubjects extends Subjects = never,
 >(
 	params: ExecCommandParams<
@@ -36,13 +34,19 @@ export function exec<
 	execute: (
 		params: CreateCommandExecuteParams<
 			GenericOptions,
-			Extract<GenericSubjects, AnyTuple<Argument>>
+			Extract<
+				GenericSubjects,
+				DCommon.AnyTuple<Argument>
+			>
 		>,
-	) => MaybePromise<void>,
-): Promise<void>;
+	) => DCommon.MaybePromise<void>,
+): Promise<
+	| DEither.Ok
+	| DEither.Error<Error>
+>;
 
 export async function exec(
-	...args: [AnyFunction] | [ExecCommandParams, AnyFunction]
+	...args: [DCommon.AnyFunction] | [ExecCommandParams, DCommon.AnyFunction]
 ) {
 	const [params, execute] = args.length === 1
 		? [{}, args[0]]
@@ -57,13 +61,15 @@ export async function exec(
 		params,
 		execute,
 	).execute(
-		getProcessArguments(),
+		DServerCommon.getProcessArguments(),
 		error,
 	);
 
 	if (result === SymbolCommandError) {
 		// eslint-disable-next-line no-console
 		console.error(interpretCommandError(error));
-		return void exitProcess(1);
+		return DEither.error(error);
 	}
+
+	return DEither.ok();
 }

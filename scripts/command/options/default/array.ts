@@ -6,7 +6,7 @@ import type * as DArray from "@duplojs/lang/array";
 import * as DEither from "@duplojs/lang/either";
 import * as DServerDataStructure from "@scripts/dataStructure";
 import { createOption, type Option } from "../base";
-import type { EligibleType } from "../types";
+import type { EligibleType } from "../../types";
 import { createKind } from "../../../kind";
 
 const defaultSeparator = ",";
@@ -43,11 +43,12 @@ export const createArrayOption = createOption(
 	arrayOptionKind,
 	({ init }) => <
 		GenericName extends string,
-		GenericValue extends EligibleType,
+		GenericStructure extends DDataStructure.Structure<EligibleType>,
+		GenericValue extends DDataStructure.StructureValue<GenericStructure>,
 		const GenericParams extends CreateArrayOptionParams = {},
 	>(
 		name: GenericName,
-		dataStructure: DDataStructure.Structure<GenericValue>,
+		dataStructure: GenericStructure,
 		params?: GenericParams,
 	): ArrayOption<
 		GenericName,
@@ -77,7 +78,6 @@ export const createArrayOption = createOption(
 			if (value === null && self.required === true) {
 				return error.addRequiredOptionCommandIssue(
 					self.name,
-					undefined,
 				);
 			}
 
