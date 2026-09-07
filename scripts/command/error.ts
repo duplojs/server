@@ -248,7 +248,7 @@ export function interpretCommandError(
 			DArray.map(
 				error.issues,
 				DPattern.matchWithTaggedObject({
-					DataStructureArgumentIssue: ({ argumentName }) => [
+					DataStructureArgumentIssue: ({ argumentName, dataStructureError }) => [
 						DPrinter.render(
 							[
 								DPrinter.indent(1),
@@ -257,6 +257,7 @@ export function interpretCommandError(
 							],
 							"",
 						),
+						interpretDataStructureError(dataStructureError, dataStructureErrorInterpreter),
 					],
 					RequiredArgumentIssue: ({ argumentName }) => [
 						DPrinter.render(
@@ -269,7 +270,7 @@ export function interpretCommandError(
 						),
 						`${DPrinter.indent(1)}↳ Missing Argument`,
 					],
-					DataStructureOptionIssue: ({ optionName }) => [
+					DataStructureOptionIssue: ({ optionName, dataStructureError }) => [
 						DPrinter.render(
 							[
 								DPrinter.indent(1),
@@ -278,6 +279,7 @@ export function interpretCommandError(
 							],
 							"",
 						),
+						interpretDataStructureError(dataStructureError, dataStructureErrorInterpreter),
 					],
 					RequiredOptionIssue: ({ optionName }) => [
 						DPrinter.render(
@@ -327,39 +329,26 @@ export function interpretDataStructureError(
 	error: DDataStructure.Error,
 	dataStructureErrorInterpreter: DDataStructure.ErrorInterpreter,
 ) {
-	const issues = dataStructureErrorInterpreter(error);
-
-	return DPrinter.renderParagraph(
-		[
-			DPrinter.colorizedBold("Invalid options", "red"),
-			error.issues.map(
-				(issue) => DPrinter.renderParagraph(
-					[
-						issue.type === "option"
-						&& issue.target
-						&& DPrinter.render(
-							[
-								DPrinter.indent(1),
-								DPrinter.colorizedBold("OPTION: ", "blue"),
-								`--${issue.target}`,
-							],
-							"",
-						),
-						DPrinter.renderLine(
-							[
-								DPrinter.colorizedBold("✖", "red"),
-								issue.parserPath && DPrinter.colorizedBold(issue.parserPath, "cyan"),
-								"expected",
-								DPrinter.colorized(issue.expected, "green"),
-								"but received",
-								DPrinter.colorized(DString.stringify(issue.received), "red"),
-							],
-						),
-						issue.message !== undefined && `${DPrinter.indent(1)}↳ ${issue.message}`,
-					],
-				),
+	return DCommon.pipe(
+		dataStructureErrorInterpreter(error),
+		DArray.map(
+			({ interpretedMessage, path }) => DPrinter.render(
+				[
+					DPrinter.indent(1),
+					"↳ ",
+					DPrinter.colorizedBold(path || "<value>", "cyan"),
+					" : ",
+					DPrinter.colorizedBold(
+						interpretedMessage.subSource
+							?? interpretedMessage.interpretedSubSource
+							?? interpretedMessage.source
+							?? interpretedMessage.interpretedSource
+							?? "unknown data structure error.",
+						"red",
+					),
+				],
+				"",
 			),
-			error.issues.length === 0 && "No issue found",
-		],
+		),
 	);
 }
