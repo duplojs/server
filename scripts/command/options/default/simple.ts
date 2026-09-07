@@ -3,9 +3,9 @@ import type * as DKind from "@duplojs/lang/kind";
 import * as DEither from "@duplojs/lang/either";
 import type * as DDataStructure from "@duplojs/lang/dataStructure";
 import * as DServerDataStructure from "@scripts/dataStructure";
-import { createOption, type Option } from "../base";
+import { constructOption, type Option } from "../base";
 import type { EligibleType } from "../../types";
-import { createKind } from "@scripts/kind";
+import { createKind } from "@scripts/command/kind";
 
 export const simpleOptionKind = createKind("command-simple-option");
 
@@ -29,7 +29,7 @@ export interface CreateSimpleOptionParams {
 	required?: boolean;
 }
 
-export const createSimpleOption = createOption(
+export const createOption = constructOption(
 	simpleOptionKind,
 	({ init }) => <
 		GenericName extends string,
@@ -39,7 +39,7 @@ export const createSimpleOption = createOption(
 	>(
 		name: GenericName,
 		dataStructure: GenericStructure,
-		params: GenericParams,
+		params?: GenericParams,
 	): SimpleOption<
 		GenericName,
 		(
@@ -54,7 +54,7 @@ export const createSimpleOption = createOption(
 		name,
 		async(self, value, error) => {
 			if (value === null && self.required === true) {
-				return error.addRequiredOptionCommandIssue(
+				return error.addRequiredOptionIssue(
 					self.name,
 				);
 			}
@@ -64,7 +64,7 @@ export const createSimpleOption = createOption(
 			}
 
 			if (value === undefined) {
-				return error.addRequiredOptionValueCommandIssue(
+				return error.addRequiredOptionValueIssue(
 					self.name,
 				);
 			}
@@ -75,7 +75,7 @@ export const createSimpleOption = createOption(
 			);
 
 			if (DEither.isLeft(result)) {
-				return error.addDataStructureOptionCommandIssue(
+				return error.addDataStructureOptionIssue(
 					self.name,
 					value,
 					DEither.unwrapLeft(result),
@@ -90,7 +90,7 @@ export const createSimpleOption = createOption(
 		},
 		{
 			dataStructure: dataStructure,
-			required: params.required ?? false,
+			required: params?.required ?? false,
 		},
 	) as never,
 );

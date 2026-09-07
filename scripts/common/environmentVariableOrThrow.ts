@@ -15,7 +15,7 @@ export class EnvironmentVariableError extends DKind.parentClass(
 			| DEither.Left<"decode-error", DDataStructure.Error>
 		),
 	) {
-		super(null, "Failed to load environment variables: one env file could not be read or parsed values do not match the provided schema.");
+		super(null, "Failed to load environment variables: one env file could not be read or parsed values do not match the provided structure.");
 	}
 }
 

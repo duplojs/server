@@ -10,4 +10,3 @@ export * as DServerDataStructure from "./dataStructure";
 
 export * as SC from "./command";
 export * as DServerCommand from "./command";
-

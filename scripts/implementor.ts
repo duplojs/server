@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
+/* oxlint-disable @typescript-eslint/consistent-type-imports */
 import { type AnyFunction, createEnum, createGlobalStore, type GetEnumValue, memoPromise } from "@duplojs/lang";
 
 export interface ServerFunction {}

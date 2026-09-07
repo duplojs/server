@@ -60,8 +60,8 @@ export const environmentVariable = implementFunction(
 
 			const expandEnvResult = expandEnvironmentVariables(overrideEnvResult);
 
-			const schema = DDataStructure.object(shape);
-			const parsedEnvResult = await schema.asyncUnsafeDecode(
+			const structure = DDataStructure.object(shape);
+			const parsedEnvResult = await structure.asyncUnsafeDecode(
 				envFileParams?.codecs ?? DServerDataStructure.codecsString,
 				expandEnvResult,
 			);
@@ -93,8 +93,8 @@ export const environmentVariable = implementFunction(
 
 			const expandEnvResult = expandEnvironmentVariables(overrideEnvResult);
 
-			const schema = DDataStructure.object(shape);
-			const parsedEnvResult = await schema.asyncUnsafeDecode(
+			const structure = DDataStructure.object(shape);
+			const parsedEnvResult = await structure.asyncUnsafeDecode(
 				envFileParams?.codecs ?? DDataStructure.codecsString,
 				expandEnvResult,
 			);

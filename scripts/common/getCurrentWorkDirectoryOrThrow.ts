@@ -15,7 +15,7 @@ export class GetCurrentWorkDirectoryError extends DKind.parentClass(
 	}
 }
 
-export function getCurrentWorkDirectoryOrThro() {
+export function getCurrentWorkDirectoryOrThrow() {
 	return DEither.whenIsRightOtherwise(
 		getCurrentWorkDirectory(),
 		DCommon.forward,

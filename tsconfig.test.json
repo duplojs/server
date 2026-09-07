@@ -5,7 +5,7 @@
     "paths": {
 	  "@scripts": ["./scripts/index.ts"],
       "@scripts/*": ["./scripts/*"],
-      "@test/*": ["./test/*"],
+      "@tests/*": ["./tests/*"],
     },
   },
   "include": [

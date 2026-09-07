@@ -1,4 +1,4 @@
-import { type FileType } from "../time";
+import type { FileType } from "../file";
 
 declare module "@duplojs/lang/dataStructure" {
 	interface TypesStore {
