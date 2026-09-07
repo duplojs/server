@@ -1,6 +1,9 @@
+import * as DCommon from "@duplojs/lang/common";
 import * as DPrinter from "@duplojs/lang/printer";
 import * as DString from "@duplojs/lang/string";
 import * as DModeling from "@duplojs/lang/modeling";
+import * as DArray from "@duplojs/lang/array";
+import * as DPattern from "@duplojs/lang/pattern";
 import type * as DDataStructure from "@duplojs/lang/dataStructure";
 
 export interface OptionIssueBase {
@@ -228,6 +231,7 @@ export function createError(
 
 export function interpretCommandError(
 	error: Error,
+	dataStructureErrorInterpreter: DDataStructure.ErrorInterpreter,
 ): string {
 	return DPrinter.renderParagraph(
 		[
@@ -241,51 +245,90 @@ export function interpretCommandError(
 				],
 				"",
 			),
-			error.issues.map(
-				(issue) => DPrinter.renderParagraph(
-					[
-						issue.type === "option"
-						&& issue.target
-						&& DPrinter.render(
-							[
-								DPrinter.indent(1),
-								DPrinter.colorizedBold("OPTION: ", "blue"),
-								`--${issue.target}`,
-							],
-							"",
-						),
-						issue.type === "argument"
-						&& issue.target
-						&& DPrinter.render(
+			DArray.map(
+				error.issues,
+				DPattern.matchWithTaggedObject({
+					DataStructureArgumentIssue: ({ argumentName }) => [
+						DPrinter.render(
 							[
 								DPrinter.indent(1),
 								DPrinter.colorizedBold("ARGUMENT: ", "magenta"),
-								issue.target,
+								`--${argumentName}`,
 							],
 							"",
 						),
-						DPrinter.renderLine(
-							[
-								DPrinter.colorizedBold("✖", "red"),
-								issue.parserPath && DPrinter.colorizedBold(issue.parserPath, "cyan"),
-								"expected",
-								DPrinter.colorized(issue.expected, "green"),
-								"but received",
-								DPrinter.colorized(DString.stringify(issue.received), "red"),
-							],
-						),
-						issue.message !== undefined && `${DPrinter.indent(1)}↳ ${issue.message}`,
 					],
-				),
+					RequiredArgumentIssue: ({ argumentName }) => [
+						DPrinter.render(
+							[
+								DPrinter.indent(1),
+								DPrinter.colorizedBold("ARGUMENT: ", "magenta"),
+								argumentName,
+							],
+							"",
+						),
+						`${DPrinter.indent(1)}↳ Missing Argument`,
+					],
+					DataStructureOptionIssue: ({ optionName }) => [
+						DPrinter.render(
+							[
+								DPrinter.indent(1),
+								DPrinter.colorizedBold("OPTION: ", "blue"),
+								`--${optionName}`,
+							],
+							"",
+						),
+					],
+					RequiredOptionIssue: ({ optionName }) => [
+						DPrinter.render(
+							[
+								DPrinter.indent(1),
+								DPrinter.colorizedBold("OPTION: ", "blue"),
+								`--${optionName}`,
+							],
+							"",
+						),
+						`${DPrinter.indent(1)}↳ Missing Option`,
+					],
+					RequiredOptionValueIssue: ({ optionName }) => [
+						DPrinter.render(
+							[
+								DPrinter.indent(1),
+								DPrinter.colorizedBold("OPTION: ", "blue"),
+								`--${optionName}`,
+							],
+							"",
+						),
+						`${DPrinter.indent(1)}↳ Missing Option Value`,
+					],
+					UnexpectedOptionValueIssue: ({ optionName }) => [
+						DPrinter.render(
+							[
+								DPrinter.indent(1),
+								DPrinter.colorizedBold("OPTION: ", "blue"),
+								`--${optionName}`,
+							],
+							"",
+						),
+						`${DPrinter.indent(1)}↳ Unexpected Value At This Option`,
+					],
+					TooMuchCommandArgumentIssue: ({ expect, receive }) => [
+						`${DPrinter.indent(1)} Too Much Arguments`,
+						`${DPrinter.indent(1)} expect: ${expect} receive: ${receive}`,
+					],
+				}),
 			),
 			error.issues.length === 0 && "No issue found",
 		],
 	);
 }
 
-export function interpretExecOptionError(
-	error: Error,
-): string {
+export function interpretDataStructureError(
+	error: DDataStructure.Error,
+	dataStructureErrorInterpreter: DDataStructure.ErrorInterpreter,
+) {
+	const issues = dataStructureErrorInterpreter(error);
+
 	return DPrinter.renderParagraph(
 		[
 			DPrinter.colorizedBold("Invalid options", "red"),
