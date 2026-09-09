@@ -9,3 +9,6 @@ wip:
   
 md:
   - "*.md"
+
+docs:
+  - "docs/**/*"
