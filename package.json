@@ -17,7 +17,9 @@
     "build": "./.commands/build.sh",
     "test:ut": "./.commands/test-ut.sh",
     "test:ut:watch": "./.commands/test-ut.sh --watch",
-    "test:ut:update": "./.commands/test-ut.sh --update",
+    "test:integrations:node": "./.commands/test-integrations.sh node",
+    "test:integrations:bun": "./.commands/test-integrations.sh bun",
+    "test:integrations:deno": "./.commands/test-integrations.sh deno",
     "test:types": "./.commands/test-types.sh",
     "test:types:target": "./.commands/test-types-target.sh",
     "test:lint": "./.commands/test-lint.sh",
@@ -42,7 +44,7 @@
       "require": "./dist/common/index.cjs",
       "types": "./dist/common/index.d.ts"
     },
-   "./dataStructure": {
+    "./dataStructure": {
       "import": "./dist/dataStructure/index.mjs",
       "require": "./dist/dataStructure/index.cjs",
       "types": "./dist/dataStructure/index.d.ts"
@@ -54,23 +56,24 @@
     }
   },
   "peerDependencies": {
-    "@duplojs/lang": "0.0.1-beta.9"
+    "@duplojs/lang": "0.0.1-beta.11"
   },
   "devDependencies": {
-    "@duplojs/code-config": "0.1.0",
-    "@types/node": "24.13.3",
-    "@types/deno": "2.7.0",
+    "@duplojs/code-config": "0.2.0",
+    "oxlint": "1.82.0",
     "@types/bun": "1.4.1",
+    "@types/deno": "2.7.0",
+    "@types/node": "24.13.3",
+    "@typescript/typescript6": "6.0.2",
+    "@vitest/coverage-istanbul": "5.0.0",
     "husky": "9.1.7",
     "rolldown": "1.2.7",
-    "unplugin-dts": "1.1.0",
-    "@typescript/typescript6": "6.0.2",
+    "tscw-config": "1.1.2",
     "tslib": "2.8.1",
     "tsx": "4.23.13",
-    "tscw-config": "1.1.2",
     "typescript": "7.0.2",
-    "vitest": "5.0.0",
-    "@vitest/coverage-istanbul": "5.0.0"
+    "unplugin-dts": "1.1.0",
+    "vitest": "5.0.0"
   },
   "workspaces": [
     "integrations",
@@ -85,6 +88,7 @@
     "file",
     "fileSystem",
     "cli",
+    "command",
     "dotenv",
     "env",
     "server-utils"

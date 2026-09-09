@@ -36,5 +36,6 @@ export default defineConfig({
 		".commands/**",
 		".agents/**",
 		"global.d.ts",
+		"integrations/deno/**",
 	],
 });

@@ -1,5 +1,6 @@
 {
   "name": "integrations",
+  "type": "module",
   "dependencies": {
     "@duplojs/server": "file:.."
   }

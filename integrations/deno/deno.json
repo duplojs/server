@@ -1,0 +1,43 @@
+{
+  "test": {
+    "permissions": "read-and-write",
+    "include": [
+      "integrations/deno"
+    ]
+  },
+  "compilerOptions": {
+    "lib": ["deno.ns", "dom"],
+    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "skipLibCheck": true
+  },
+  "imports": {
+    "@duplojs/server": "../../dist/index.mjs",
+    "@duplojs/lang": "npm:@duplojs/lang@0.0.1-beta.11",
+    "@std/assert": "jsr:@std/assert@^1.0.17",
+    "@std/testing/bdd": "jsr:@std/testing@^1.0.17/bdd"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-sloppy-imports"]
+    }
+  },
+  "permissions": {
+    "read-and-write": {
+      "read": true,
+      "write": true,
+      "env": true
+    }
+  }
+}

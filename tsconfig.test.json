@@ -11,6 +11,7 @@
   "include": [
 	"tests/**/*.ts",
 	"scripts/**/*.ts", 
-	"integrations/**/*.ts",
+	"integrations/bun/tsconfig.json",
+	"integrations/node/tsconfig.json",
   ],
 }

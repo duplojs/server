@@ -8,6 +8,10 @@ export default defineConfig({
 			"tests/**/*.test.ts",
 			"integrations/**/*.test.ts",
 		],
+		exclude: [
+			"integrations/deno/*.test.ts",
+			"integrations/bun/*.test.ts",
+		],
 		coverage: {
 			provider: "istanbul",
 			reporter: ["text", "json", "html", "json-summary"],
