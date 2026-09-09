@@ -1,8 +1,10 @@
-import { E } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "../_utils/fsPromises.mock";
-import { setDenoMock } from "../_utils/deno.mock";
-import { setBunMock } from "../_utils/bun.mock";
+import type * as DPath from "@duplojs/lang/path";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
+import { setBunMock } from "@tests/_utils/bun.mock";
 
 describe("exists", () => {
 	afterEach(() => {
@@ -15,9 +17,9 @@ describe("exists", () => {
 			access: vi.fn().mockResolvedValue(undefined),
 		});
 
-		const result = await DServerFile.exists("/tmp/mock");
+		const result = await DServerFile.exists<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 	});
 
 	it("returns fail in NODE env when access rejects", async() => {
@@ -26,9 +28,9 @@ describe("exists", () => {
 			access: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.exists("/tmp/mock");
+		const result = await DServerFile.exists<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("returns ok in DENO env when stat resolves", async() => {
@@ -37,9 +39,9 @@ describe("exists", () => {
 			stat: vi.fn().mockResolvedValue({}),
 		});
 
-		const result = await DServerFile.exists("/tmp/mock");
+		const result = await DServerFile.exists<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 	});
 
 	it("returns fail in DENO env when stat rejects", async() => {
@@ -48,9 +50,9 @@ describe("exists", () => {
 			stat: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.exists("/tmp/mock");
+		const result = await DServerFile.exists<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("returns ok in BUN env when file exists", async() => {
@@ -61,9 +63,9 @@ describe("exists", () => {
 			}),
 		});
 
-		const result = await DServerFile.exists("/tmp/mock");
+		const result = await DServerFile.exists<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 	});
 
 	it("returns fail in BUN env when file does not exist", async() => {
@@ -74,9 +76,9 @@ describe("exists", () => {
 			}),
 		});
 
-		const result = await DServerFile.exists("/tmp/mock");
+		const result = await DServerFile.exists<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("returns fail in BUN env when exists throws", async() => {
@@ -87,8 +89,8 @@ describe("exists", () => {
 			}),
 		});
 
-		const result = await DServerFile.exists("/tmp/mock");
+		const result = await DServerFile.exists<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

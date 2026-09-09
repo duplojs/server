@@ -1,7 +1,8 @@
-import { E } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
-import { setDenoMock } from "tests/_utils/deno.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
 
 describe("link", () => {
 	afterEach(() => {
@@ -14,9 +15,9 @@ describe("link", () => {
 			link: vi.fn().mockResolvedValue(undefined),
 		});
 
-		const result = await DServerFile.link("/tmp/existing", "/tmp/new");
+		const result = await DServerFile.link(DCommon.infer("/tmp/existing"), DCommon.infer("/tmp/new"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.link).toHaveBeenCalledWith("/tmp/existing", "/tmp/new");
 	});
 
@@ -26,9 +27,9 @@ describe("link", () => {
 			link: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.link("/tmp/existing", "/tmp/new");
+		const result = await DServerFile.link(DCommon.infer("/tmp/existing"), DCommon.infer("/tmp/new"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("creates hard link in DENO env", async() => {
@@ -36,9 +37,9 @@ describe("link", () => {
 		const link = vi.fn().mockResolvedValue(undefined);
 		setDenoMock({ link });
 
-		const result = await DServerFile.link("/tmp/existing file", "/tmp/new file");
+		const result = await DServerFile.link(DCommon.infer("/tmp/existing file"), DCommon.infer("/tmp/new file"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(link).toHaveBeenCalledWith("/tmp/existing file", "/tmp/new file");
 	});
 
@@ -48,8 +49,8 @@ describe("link", () => {
 			link: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.link("/tmp/existing", "/tmp/new");
+		const result = await DServerFile.link(DCommon.infer("/tmp/existing"), DCommon.infer("/tmp/new"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

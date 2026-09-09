@@ -1,8 +1,10 @@
-import { E, unwrap } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "../_utils/fsPromises.mock";
-import { setDenoMock } from "../_utils/deno.mock";
-import { setBunMock } from "../_utils/bun.mock";
+import type * as DPath from "@duplojs/lang/path";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
+import { setBunMock } from "@tests/_utils/bun.mock";
 
 interface DenoFileInfoMock {
 	isFile: boolean;
@@ -96,11 +98,11 @@ describe("stat", () => {
 			stat: vi.fn().mockResolvedValue(stats),
 		});
 
-		const result = await DServerFile.stat("/tmp/mock");
+		const result = await DServerFile.stat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			const info = unwrap(result);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			const info = DEither.unwrapRight(result);
 			expect(info.isFile).toBe(true);
 			expect(info.sizeBytes).toBe(123);
 			expect(info.deviceId).toBe(1);
@@ -122,11 +124,11 @@ describe("stat", () => {
 			stat: vi.fn().mockResolvedValue(stats),
 		});
 
-		const result = await DServerFile.stat("/tmp/mock");
+		const result = await DServerFile.stat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			const info = unwrap(result);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			const info = DEither.unwrapRight(result);
 			expect(info.modifiedAt).toBe(null);
 			expect(info.accessedAt).toBe(null);
 			expect(info.createdAt).toBe(null);
@@ -140,9 +142,9 @@ describe("stat", () => {
 			stat: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.stat("/tmp/mock");
+		const result = await DServerFile.stat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("returns stat info in DENO env", async() => {
@@ -152,11 +154,11 @@ describe("stat", () => {
 			stat: vi.fn().mockResolvedValue(fileInfo),
 		});
 
-		const result = await DServerFile.stat("/tmp/mock");
+		const result = await DServerFile.stat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			const info = unwrap(result);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			const info = DEither.unwrapRight(result);
 			expect(info.isDirectory).toBe(false);
 			expect(info.sizeBytes).toBe(321);
 			expect(info.deviceId).toBe(10);
@@ -177,11 +179,11 @@ describe("stat", () => {
 			stat: vi.fn().mockResolvedValue(fileInfo),
 		});
 
-		const result = await DServerFile.stat("/tmp/mock");
+		const result = await DServerFile.stat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			const info = unwrap(result);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			const info = DEither.unwrapRight(result);
 			expect(info.modifiedAt).toBe(null);
 			expect(info.accessedAt).toBe(null);
 			expect(info.createdAt).toBe(null);
@@ -195,9 +197,9 @@ describe("stat", () => {
 			stat: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.stat("/tmp/mock");
+		const result = await DServerFile.stat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("returns stat info in BUN env", async() => {
@@ -209,11 +211,11 @@ describe("stat", () => {
 			}),
 		});
 
-		const result = await DServerFile.stat("/tmp/mock");
+		const result = await DServerFile.stat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result).sizeBytes).toBe(555);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result).sizeBytes).toBe(555);
 		}
 	});
 
@@ -225,8 +227,8 @@ describe("stat", () => {
 			}),
 		});
 
-		const result = await DServerFile.stat("/tmp/mock");
+		const result = await DServerFile.stat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

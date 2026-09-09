@@ -1,7 +1,9 @@
-import { E } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
-import { setDenoMock } from "tests/_utils/deno.mock";
+import type * as DPath from "@duplojs/lang/path";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
 
 describe("makeDirectory", () => {
 	afterEach(() => {
@@ -14,9 +16,9 @@ describe("makeDirectory", () => {
 			mkdir: vi.fn().mockResolvedValue(undefined),
 		});
 
-		const result = await DServerFile.makeDirectory("/tmp/mock", { recursive: true });
+		const result = await DServerFile.makeDirectory<string & DPath.Path>(DCommon.infer("/tmp/mock"), { recursive: true });
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.mkdir).toHaveBeenCalledWith("/tmp/mock", { recursive: true });
 	});
 
@@ -26,9 +28,9 @@ describe("makeDirectory", () => {
 			mkdir: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.makeDirectory("/tmp/mock");
+		const result = await DServerFile.makeDirectory<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("creates directory in DENO env", async() => {
@@ -36,9 +38,9 @@ describe("makeDirectory", () => {
 		const mkdir = vi.fn().mockResolvedValue(undefined);
 		setDenoMock({ mkdir });
 
-		const result = await DServerFile.makeDirectory("/tmp/mock", { recursive: false });
+		const result = await DServerFile.makeDirectory<string & DPath.Path>(DCommon.infer("/tmp/mock"), { recursive: false });
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(mkdir).toHaveBeenCalledWith("/tmp/mock", { recursive: false });
 	});
 
@@ -48,8 +50,8 @@ describe("makeDirectory", () => {
 			mkdir: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.makeDirectory("/tmp/mock");
+		const result = await DServerFile.makeDirectory<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

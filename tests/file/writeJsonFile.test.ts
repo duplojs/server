@@ -1,8 +1,9 @@
-import { E } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
-import { setDenoMock } from "tests/_utils/deno.mock";
-import { setBunMock } from "tests/_utils/bun.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
+import { setBunMock } from "@tests/_utils/bun.mock";
 
 describe("writeJsonFile", () => {
 	afterEach(() => {
@@ -15,9 +16,9 @@ describe("writeJsonFile", () => {
 			writeFile: vi.fn().mockResolvedValue(undefined),
 		});
 
-		const result = await DServerFile.writeJsonFile("/tmp/mock.json", { first: 1 }, { space: 2 });
+		const result = await DServerFile.writeJsonFile(DCommon.infer("/tmp/mock.json"), { first: 1 }, { space: 2 });
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.writeFile).toHaveBeenCalledWith(
 			"/tmp/mock.json",
 			JSON.stringify({ first: 1 }, null, 2),
@@ -31,9 +32,9 @@ describe("writeJsonFile", () => {
 			writeFile: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.writeJsonFile("/tmp/mock.json", { first: 1 });
+		const result = await DServerFile.writeJsonFile(DCommon.infer("/tmp/mock.json"), { first: 1 });
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("writes json file in DENO env", async() => {
@@ -43,9 +44,9 @@ describe("writeJsonFile", () => {
 			writeTextFile: spy,
 		});
 
-		const result = await DServerFile.writeJsonFile("/tmp/mock.json", { second: 2 });
+		const result = await DServerFile.writeJsonFile(DCommon.infer("/tmp/mock.json"), { second: 2 });
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(spy).toHaveBeenCalledWith("/tmp/mock.json", JSON.stringify({ second: 2 }));
 	});
 
@@ -55,9 +56,9 @@ describe("writeJsonFile", () => {
 			writeTextFile: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.writeJsonFile("/tmp/mock.json", { second: 2 });
+		const result = await DServerFile.writeJsonFile(DCommon.infer("/tmp/mock.json"), { second: 2 });
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("writes json file in BUN env", async() => {
@@ -67,9 +68,9 @@ describe("writeJsonFile", () => {
 			file: vi.fn().mockReturnValue({ write: writeSpy }),
 		});
 
-		const result = await DServerFile.writeJsonFile("/tmp/mock.json", { three: 3 });
+		const result = await DServerFile.writeJsonFile(DCommon.infer("/tmp/mock.json"), { three: 3 });
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(writeSpy).toHaveBeenCalledWith(JSON.stringify({ three: 3 }));
 	});
 
@@ -81,9 +82,9 @@ describe("writeJsonFile", () => {
 			}),
 		});
 
-		const result = await DServerFile.writeJsonFile("/tmp/mock.json", { three: 3 });
+		const result = await DServerFile.writeJsonFile(DCommon.infer("/tmp/mock.json"), { three: 3 });
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("returns fail when JSON stringify throws", async() => {
@@ -94,9 +95,9 @@ describe("writeJsonFile", () => {
 		const circular: { self?: unknown } = {};
 		circular.self = circular;
 
-		const result = await DServerFile.writeJsonFile("/tmp/mock.json", circular);
+		const result = await DServerFile.writeJsonFile(DCommon.infer("/tmp/mock.json"), circular);
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 		expect(fs.writeFile).not.toHaveBeenCalled();
 	});
 
@@ -109,9 +110,9 @@ describe("writeJsonFile", () => {
 		const circular: { self?: unknown } = {};
 		circular.self = circular;
 
-		const result = await DServerFile.writeJsonFile("/tmp/mock.json", circular);
+		const result = await DServerFile.writeJsonFile(DCommon.infer("/tmp/mock.json"), circular);
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 		expect(spy).not.toHaveBeenCalled();
 	});
 
@@ -125,9 +126,9 @@ describe("writeJsonFile", () => {
 		const circular: { self?: unknown } = {};
 		circular.self = circular;
 
-		const result = await DServerFile.writeJsonFile("/tmp/mock.json", circular);
+		const result = await DServerFile.writeJsonFile(DCommon.infer("/tmp/mock.json"), circular);
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 		expect(fileSpy).not.toHaveBeenCalled();
 		expect(writeSpy).not.toHaveBeenCalled();
 	});

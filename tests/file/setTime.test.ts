@@ -1,7 +1,9 @@
-import { D, E } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DChrono from "@duplojs/lang/chrono";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
-import { setDenoMock } from "tests/_utils/deno.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
 
 describe("setTime", () => {
 	afterEach(() => {
@@ -13,19 +15,19 @@ describe("setTime", () => {
 		const fs = setFsPromisesMock({
 			utimes: vi.fn().mockResolvedValue(undefined),
 		});
-		const accessTime = D.create("2020-01-01");
-		const modifiedTime = D.create("2020-01-02");
+		const accessTime = DChrono.createDate("2020-01-01");
+		const modifiedTime = DChrono.createDate("2020-01-02");
 
-		const result = await DServerFile.setTime("/tmp/mock", {
+		const result = await DServerFile.setTime(DCommon.infer("/tmp/mock"), {
 			accessTime,
 			modifiedTime,
 		});
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.utimes).toHaveBeenCalledWith(
 			"/tmp/mock",
-			D.toTimestamp(accessTime),
-			D.toTimestamp(modifiedTime),
+			DChrono.toTimestamp(accessTime),
+			DChrono.toTimestamp(modifiedTime),
 		);
 	});
 
@@ -34,34 +36,34 @@ describe("setTime", () => {
 		setFsPromisesMock({
 			utimes: vi.fn().mockRejectedValue(new Error("boom")),
 		});
-		const accessTime = D.now();
-		const modifiedTime = D.now();
+		const accessTime = DChrono.now();
+		const modifiedTime = DChrono.now();
 
-		const result = await DServerFile.setTime("/tmp/mock", {
+		const result = await DServerFile.setTime(DCommon.infer("/tmp/mock"), {
 			accessTime,
 			modifiedTime,
 		});
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("sets time in DENO env", async() => {
 		setEnvironment("DENO");
 		const utime = vi.fn().mockResolvedValue(undefined);
 		setDenoMock({ utime });
-		const accessTime = D.createOrThrow(1704067200000);
-		const modifiedTime = D.createOrThrow(1704153600000);
+		const accessTime = DChrono.createDateOrThrow(1704067200000);
+		const modifiedTime = DChrono.createDateOrThrow(1704153600000);
 
-		const result = await DServerFile.setTime("/tmp/mock", {
+		const result = await DServerFile.setTime(DCommon.infer("/tmp/mock"), {
 			accessTime,
 			modifiedTime,
 		});
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(utime).toHaveBeenCalledWith(
 			"/tmp/mock",
-			D.toTimestamp(accessTime),
-			D.toTimestamp(modifiedTime),
+			DChrono.toTimestamp(accessTime),
+			DChrono.toTimestamp(modifiedTime),
 		);
 	});
 
@@ -70,14 +72,14 @@ describe("setTime", () => {
 		setDenoMock({
 			utime: vi.fn().mockRejectedValue(new Error("boom")),
 		});
-		const accessTime = D.now();
-		const modifiedTime = D.now();
+		const accessTime = DChrono.now();
+		const modifiedTime = DChrono.now();
 
-		const result = await DServerFile.setTime("/tmp/mock", {
+		const result = await DServerFile.setTime(DCommon.infer("/tmp/mock"), {
 			accessTime,
 			modifiedTime,
 		});
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

@@ -1,7 +1,8 @@
-import { E, unwrap } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
-import { setDenoMock } from "tests/_utils/deno.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
 
 describe("relocate", () => {
 	afterEach(() => {
@@ -14,36 +15,43 @@ describe("relocate", () => {
 			rename: vi.fn().mockResolvedValue(undefined),
 		});
 
-		const result = await DServerFile.relocate("/tmp/file.txt", "/new/parent");
+		const result = await DServerFile.relocate(DCommon.infer("/tmp/file.txt"), DCommon.infer("/new/parent"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.rename).toHaveBeenCalledWith("/tmp/file.txt", "/new/parent/file.txt");
-		if (E.isRight(result)) {
-			expect(unwrap(result)).toBe("/new/parent/file.txt");
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result)).toBe("/new/parent/file.txt");
 		}
-	});
-
-	it("returns fail when NODE relocate receives invalid path", async() => {
-		setEnvironment("NODE");
-		const fs = setFsPromisesMock({
-			rename: vi.fn(),
-		});
-
-		const result = await DServerFile.relocate("/tmp/", "/new/parent");
-
-		expect(E.isLeft(result)).toBe(true);
-		expect(fs.rename).not.toHaveBeenCalled();
 	});
 
 	it("returns fail when NODE relocate rejects", async() => {
 		setEnvironment("NODE");
+		const error = new Error("boom");
 		setFsPromisesMock({
-			rename: vi.fn().mockRejectedValue(new Error("boom")),
+			rename: vi.fn().mockRejectedValue(error),
 		});
 
-		const result = await DServerFile.relocate("/tmp/file.txt", "/new/parent");
+		const result = await DServerFile.relocate(DCommon.infer("/tmp/file.txt"), DCommon.infer("/new/parent"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
+		if (DEither.isLeft(result)) {
+			expect(DEither.unwrapLeft(result)).toBe(error);
+		}
+	});
+
+	it("returns fail when NODE source path has no base name", async() => {
+		setEnvironment("NODE");
+		const fs = setFsPromisesMock({
+			rename: vi.fn().mockResolvedValue(undefined),
+		});
+
+		const result = await DServerFile.relocate(DCommon.infer("/"), DCommon.infer("/new/parent"));
+
+		expect(DEither.isLeft(result)).toBe(true);
+		expect(fs.rename).not.toHaveBeenCalled();
+		if (DEither.isLeft(result)) {
+			expect(DEither.unwrapLeft(result)).toBeInstanceOf(Error);
+		}
 	});
 
 	it("relocates entry in DENO env", async() => {
@@ -51,24 +59,13 @@ describe("relocate", () => {
 		const rename = vi.fn().mockResolvedValue(undefined);
 		setDenoMock({ rename });
 
-		const result = await DServerFile.relocate("/tmp/file.txt", "/new/parent");
+		const result = await DServerFile.relocate(DCommon.infer("/tmp/file.txt"), DCommon.infer("/new/parent"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(rename).toHaveBeenCalledWith("/tmp/file.txt", "/new/parent/file.txt");
-		if (E.isRight(result)) {
-			expect(unwrap(result)).toBe("/new/parent/file.txt");
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result)).toBe("/new/parent/file.txt");
 		}
-	});
-
-	it("returns fail when DENO relocate receives invalid path", async() => {
-		setEnvironment("DENO");
-		const rename = vi.fn();
-		setDenoMock({ rename });
-
-		const result = await DServerFile.relocate("/tmp/", "/new/parent");
-
-		expect(E.isLeft(result)).toBe(true);
-		expect(rename).not.toHaveBeenCalled();
 	});
 
 	it("returns fail when DENO relocate rejects", async() => {
@@ -77,8 +74,22 @@ describe("relocate", () => {
 			rename: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.relocate("/tmp/file.txt", "/new/parent");
+		const result = await DServerFile.relocate(DCommon.infer("/tmp/file.txt"), DCommon.infer("/new/parent"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
+	});
+
+	it("returns fail when DENO source path has no base name", async() => {
+		setEnvironment("DENO");
+		const rename = vi.fn().mockResolvedValue(undefined);
+		setDenoMock({ rename });
+
+		const result = await DServerFile.relocate(DCommon.infer("/"), DCommon.infer("/new/parent"));
+
+		expect(DEither.isLeft(result)).toBe(true);
+		expect(rename).not.toHaveBeenCalled();
+		if (DEither.isLeft(result)) {
+			expect(DEither.unwrapLeft(result)).toBeInstanceOf(Error);
+		}
 	});
 });

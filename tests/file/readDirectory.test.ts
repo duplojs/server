@@ -1,6 +1,8 @@
-import { E, unwrap } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
+import type * as DPath from "@duplojs/lang/path";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
 
 describe("readDirectory", () => {
 	afterEach(() => {
@@ -13,12 +15,12 @@ describe("readDirectory", () => {
 			readdir: vi.fn().mockResolvedValue(["a", "b"]),
 		});
 
-		const result = await DServerFile.readDirectory("/tmp/mock", { recursive: true });
+		const result = await DServerFile.readDirectory<string & DPath.Path>(DCommon.infer("/tmp/mock"), { recursive: true });
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.readdir).toHaveBeenCalledWith("/tmp/mock", { recursive: true });
-		if (E.isRight(result)) {
-			expect(unwrap(result)).toEqual(["a", "b"]);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result)).toEqual(["a", "b"]);
 		}
 	});
 
@@ -28,8 +30,8 @@ describe("readDirectory", () => {
 			readdir: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.readDirectory("/tmp/mock");
+		const result = await DServerFile.readDirectory<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

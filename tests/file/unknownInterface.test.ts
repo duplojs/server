@@ -1,6 +1,7 @@
-import { E, unwrap } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
 
 function createNodeStatsMock() {
 	const now = new Date("2020-01-01T00:00:00Z");
@@ -35,9 +36,9 @@ describe("unknownInterface", () => {
 	});
 
 	it("detects unknown interface with predicate", () => {
-		const unknown = DServerFile.createUnknownInterface("/tmp/entry");
-		const file = DServerFile.createFileInterface("/tmp/example.json");
-		const folder = DServerFile.createFolderInterface("/tmp/demo");
+		const unknown = DServerFile.createUnknownInterface(DCommon.infer("/tmp/entry"));
+		const file = DServerFile.createFileInterface(DCommon.infer("/tmp/example.json"));
+		const folder = DServerFile.createFolderInterface(DCommon.infer("/tmp/demo"));
 
 		expect(DServerFile.isUnknownInterface(unknown)).toBe(true);
 		expect(DServerFile.isUnknownInterface(file)).toBe(false);
@@ -46,18 +47,18 @@ describe("unknownInterface", () => {
 	});
 
 	it("creates interface with name and parent path", () => {
-		const unknown = DServerFile.createUnknownInterface("/tmp/unknown path");
+		const unknown = DServerFile.createUnknownInterface(DCommon.infer("/tmp/unknown path"));
 
 		expect(unknown.getName()).toBe("unknown path");
 		expect(unknown.path).toBe("/tmp/unknown path");
 		expect(unknown.getParentPath()).toBe("/tmp");
 	});
 
-	it("returns null parent path when no separator is present", () => {
-		const unknown = DServerFile.createUnknownInterface("file");
+	it("returns current directory as parent path when no separator is present", () => {
+		const unknown = DServerFile.createUnknownInterface(DCommon.infer("file"));
 
 		expect(unknown.getName()).toBe("file");
-		expect(unknown.getParentPath()).toBe(null);
+		expect(unknown.getParentPath()).toBe(".");
 	});
 
 	it("checks existence via fs access", async() => {
@@ -65,11 +66,11 @@ describe("unknownInterface", () => {
 		const fs = setFsPromisesMock({
 			access: vi.fn().mockResolvedValue(undefined),
 		});
-		const unknown = DServerFile.createUnknownInterface("/tmp/unknown");
+		const unknown = DServerFile.createUnknownInterface(DCommon.infer("/tmp/unknown"));
 
 		const result = await unknown.exist();
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.access).toHaveBeenCalledWith("/tmp/unknown");
 	});
 
@@ -78,14 +79,14 @@ describe("unknownInterface", () => {
 		const fs = setFsPromisesMock({
 			stat: vi.fn().mockResolvedValue(createNodeStatsMock()),
 		});
-		const unknown = DServerFile.createUnknownInterface("/tmp/unknown");
+		const unknown = DServerFile.createUnknownInterface(DCommon.infer("/tmp/unknown"));
 
 		const result = await unknown.stat();
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.stat).toHaveBeenCalledWith("/tmp/unknown");
-		if (E.isRight(result)) {
-			expect(unwrap(result).sizeBytes).toBe(789);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result).sizeBytes).toBe(789);
 		}
 	});
 });

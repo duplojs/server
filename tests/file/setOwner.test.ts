@@ -1,7 +1,8 @@
-import { E } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
-import { setDenoMock } from "tests/_utils/deno.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
 
 describe("setOwner", () => {
 	afterEach(() => {
@@ -14,12 +15,12 @@ describe("setOwner", () => {
 			chown: vi.fn().mockResolvedValue(undefined),
 		});
 
-		const result = await DServerFile.setOwner("/tmp/mock", {
+		const result = await DServerFile.setOwner(DCommon.infer("/tmp/mock"), {
 			userId: 1,
 			groupId: 2,
 		});
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.chown).toHaveBeenCalledWith("/tmp/mock", 1, 2);
 	});
 
@@ -29,12 +30,12 @@ describe("setOwner", () => {
 			chown: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.setOwner("/tmp/mock", {
+		const result = await DServerFile.setOwner(DCommon.infer("/tmp/mock"), {
 			userId: 1,
 			groupId: 2,
 		});
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("sets owner in DENO env", async() => {
@@ -42,12 +43,12 @@ describe("setOwner", () => {
 		const chown = vi.fn().mockResolvedValue(undefined);
 		setDenoMock({ chown });
 
-		const result = await DServerFile.setOwner("/tmp/mock", {
+		const result = await DServerFile.setOwner(DCommon.infer("/tmp/mock"), {
 			userId: 3,
 			groupId: 4,
 		});
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(chown).toHaveBeenCalledWith("/tmp/mock", 3, 4);
 	});
 
@@ -57,11 +58,11 @@ describe("setOwner", () => {
 			chown: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.setOwner("/tmp/mock", {
+		const result = await DServerFile.setOwner(DCommon.infer("/tmp/mock"), {
 			userId: 3,
 			groupId: 4,
 		});
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

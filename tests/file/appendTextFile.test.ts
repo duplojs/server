@@ -1,7 +1,8 @@
-import { E } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "../_utils/fsPromises.mock";
-import { setDenoMock } from "../_utils/deno.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
 
 describe("appendTextFile", () => {
 	afterEach(() => {
@@ -14,9 +15,9 @@ describe("appendTextFile", () => {
 			appendFile: vi.fn().mockResolvedValue(undefined),
 		});
 
-		const result = await DServerFile.appendTextFile("/tmp/mock", "hello");
+		const result = await DServerFile.appendTextFile(DCommon.infer("/tmp/mock"), "hello");
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.appendFile).toHaveBeenCalledWith("/tmp/mock", "hello");
 	});
 
@@ -26,9 +27,9 @@ describe("appendTextFile", () => {
 			appendFile: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.appendTextFile("/tmp/mock", "hello");
+		const result = await DServerFile.appendTextFile(DCommon.infer("/tmp/mock"), "hello");
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("appends text file in DENO env", async() => {
@@ -38,9 +39,9 @@ describe("appendTextFile", () => {
 			writeTextFile: spy,
 		});
 
-		const result = await DServerFile.appendTextFile("/tmp/mock", "deno");
+		const result = await DServerFile.appendTextFile(DCommon.infer("/tmp/mock"), "deno");
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(spy).toHaveBeenCalledWith("/tmp/mock", "deno", { append: true });
 	});
 
@@ -50,8 +51,8 @@ describe("appendTextFile", () => {
 			writeTextFile: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.appendTextFile("/tmp/mock", "deno");
+		const result = await DServerFile.appendTextFile(DCommon.infer("/tmp/mock"), "deno");
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

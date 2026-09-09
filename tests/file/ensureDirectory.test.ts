@@ -1,7 +1,9 @@
-import { E } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
-import { setDenoMock } from "tests/_utils/deno.mock";
+import type * as DPath from "@duplojs/lang/path";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
 
 describe("ensureDirectory", () => {
 	afterEach(() => {
@@ -14,9 +16,9 @@ describe("ensureDirectory", () => {
 			mkdir: vi.fn().mockResolvedValue(undefined),
 		});
 
-		const result = await DServerFile.ensureDirectory("/tmp/mock");
+		const result = await DServerFile.ensureDirectory<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.mkdir).toHaveBeenCalledWith("/tmp/mock", { recursive: true });
 	});
 
@@ -26,9 +28,9 @@ describe("ensureDirectory", () => {
 			mkdir: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.ensureDirectory("/tmp/mock");
+		const result = await DServerFile.ensureDirectory<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("ensures directory in DENO env", async() => {
@@ -36,9 +38,9 @@ describe("ensureDirectory", () => {
 		const mkdir = vi.fn().mockResolvedValue(undefined);
 		setDenoMock({ mkdir });
 
-		const result = await DServerFile.ensureDirectory("/tmp/mock");
+		const result = await DServerFile.ensureDirectory<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(mkdir).toHaveBeenCalledWith("/tmp/mock", { recursive: true });
 	});
 
@@ -48,8 +50,8 @@ describe("ensureDirectory", () => {
 			mkdir: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.ensureDirectory("/tmp/mock");
+		const result = await DServerFile.ensureDirectory<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

@@ -1,8 +1,9 @@
-import { E } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "../_utils/fsPromises.mock";
-import { setDenoMock } from "../_utils/deno.mock";
-import { setBunMock } from "../_utils/bun.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
+import { setBunMock } from "@tests/_utils/bun.mock";
 
 describe("writeTextFile", () => {
 	afterEach(() => {
@@ -15,9 +16,9 @@ describe("writeTextFile", () => {
 			writeFile: vi.fn().mockResolvedValue(undefined),
 		});
 
-		const result = await DServerFile.writeTextFile("/tmp/mock", "hello");
+		const result = await DServerFile.writeTextFile(DCommon.infer("/tmp/mock"), "hello");
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.writeFile).toHaveBeenCalledWith("/tmp/mock", "hello", { encoding: "utf-8" });
 	});
 
@@ -27,9 +28,9 @@ describe("writeTextFile", () => {
 			writeFile: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.writeTextFile("/tmp/mock", "hello");
+		const result = await DServerFile.writeTextFile(DCommon.infer("/tmp/mock"), "hello");
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("writes text file in DENO env", async() => {
@@ -39,9 +40,9 @@ describe("writeTextFile", () => {
 			writeTextFile: spy,
 		});
 
-		const result = await DServerFile.writeTextFile("/tmp/mock", "deno");
+		const result = await DServerFile.writeTextFile(DCommon.infer("/tmp/mock"), "deno");
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(spy).toHaveBeenCalledWith("/tmp/mock", "deno");
 	});
 
@@ -51,9 +52,9 @@ describe("writeTextFile", () => {
 			writeTextFile: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.writeTextFile("/tmp/mock", "deno");
+		const result = await DServerFile.writeTextFile(DCommon.infer("/tmp/mock"), "deno");
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("writes text file in BUN env", async() => {
@@ -63,9 +64,9 @@ describe("writeTextFile", () => {
 			file: vi.fn().mockReturnValue({ write: writeSpy }),
 		});
 
-		const result = await DServerFile.writeTextFile("/tmp/mock", "bun");
+		const result = await DServerFile.writeTextFile(DCommon.infer("/tmp/mock"), "bun");
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(writeSpy).toHaveBeenCalledWith("bun");
 	});
 
@@ -77,8 +78,8 @@ describe("writeTextFile", () => {
 			}),
 		});
 
-		const result = await DServerFile.writeTextFile("/tmp/mock", "bun");
+		const result = await DServerFile.writeTextFile(DCommon.infer("/tmp/mock"), "bun");
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

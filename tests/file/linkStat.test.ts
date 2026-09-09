@@ -1,7 +1,9 @@
-import { E, unwrap } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "../_utils/fsPromises.mock";
-import { setDenoMock } from "../_utils/deno.mock";
+import type * as DPath from "@duplojs/lang/path";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
 
 interface DenoFileInfoMock {
 	isFile: boolean;
@@ -95,11 +97,11 @@ describe("linkStat", () => {
 			lstat: vi.fn().mockResolvedValue(stats),
 		});
 
-		const result = await DServerFile.linkStat("/tmp/mock");
+		const result = await DServerFile.linkStat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result).sizeBytes).toBe(777);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result).sizeBytes).toBe(777);
 		}
 	});
 
@@ -116,11 +118,11 @@ describe("linkStat", () => {
 			lstat: vi.fn().mockResolvedValue(stats),
 		});
 
-		const result = await DServerFile.linkStat("/tmp/mock");
+		const result = await DServerFile.linkStat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			const info = unwrap(result);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			const info = DEither.unwrapRight(result);
 			expect(info.modifiedAt).toBe(null);
 			expect(info.accessedAt).toBe(null);
 			expect(info.createdAt).toBe(null);
@@ -134,9 +136,9 @@ describe("linkStat", () => {
 			lstat: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.linkStat("/tmp/mock");
+		const result = await DServerFile.linkStat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("returns link stat info in DENO env", async() => {
@@ -146,11 +148,11 @@ describe("linkStat", () => {
 			lstat: vi.fn().mockResolvedValue(fileInfo),
 		});
 
-		const result = await DServerFile.linkStat("/tmp/mock");
+		const result = await DServerFile.linkStat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result).sizeBytes).toBe(888);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result).sizeBytes).toBe(888);
 		}
 	});
 
@@ -166,11 +168,11 @@ describe("linkStat", () => {
 			lstat: vi.fn().mockResolvedValue(fileInfo),
 		});
 
-		const result = await DServerFile.linkStat("/tmp/mock");
+		const result = await DServerFile.linkStat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			const info = unwrap(result);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			const info = DEither.unwrapRight(result);
 			expect(info.modifiedAt).toBe(null);
 			expect(info.accessedAt).toBe(null);
 			expect(info.createdAt).toBe(null);
@@ -184,8 +186,8 @@ describe("linkStat", () => {
 			lstat: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.linkStat("/tmp/mock");
+		const result = await DServerFile.linkStat<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

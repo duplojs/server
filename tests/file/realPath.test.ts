@@ -1,7 +1,9 @@
-import { E, unwrap } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "../_utils/fsPromises.mock";
-import { setDenoMock } from "../_utils/deno.mock";
+import type * as DPath from "@duplojs/lang/path";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
 
 describe("realPath", () => {
 	afterEach(() => {
@@ -14,11 +16,11 @@ describe("realPath", () => {
 			realpath: vi.fn().mockResolvedValue("/real/path"),
 		});
 
-		const result = await DServerFile.realPath("/tmp/mock");
+		const result = await DServerFile.realPath<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result)).toBe("/real/path");
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result)).toBe("/real/path");
 		}
 	});
 
@@ -28,9 +30,9 @@ describe("realPath", () => {
 			realpath: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.realPath("/tmp/mock");
+		const result = await DServerFile.realPath<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("returns real path in DENO env", async() => {
@@ -39,11 +41,11 @@ describe("realPath", () => {
 			realPath: vi.fn().mockResolvedValue("/deno/real"),
 		});
 
-		const result = await DServerFile.realPath("/tmp/mock");
+		const result = await DServerFile.realPath<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result)).toBe("/deno/real");
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result)).toBe("/deno/real");
 		}
 	});
 
@@ -53,8 +55,8 @@ describe("realPath", () => {
 			realPath: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.realPath("/tmp/mock");
+		const result = await DServerFile.realPath<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

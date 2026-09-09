@@ -1,7 +1,8 @@
-import { E } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "../_utils/fsPromises.mock";
-import { setDenoMock } from "../_utils/deno.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
 
 describe("appendFile", () => {
 	afterEach(() => {
@@ -15,9 +16,9 @@ describe("appendFile", () => {
 			appendFile: vi.fn().mockResolvedValue(undefined),
 		});
 
-		const result = await DServerFile.appendFile("/tmp/mock", data);
+		const result = await DServerFile.appendFile(DCommon.infer("/tmp/mock"), data);
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.appendFile).toHaveBeenCalledWith("/tmp/mock", data);
 	});
 
@@ -27,9 +28,9 @@ describe("appendFile", () => {
 			appendFile: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.appendFile("/tmp/mock", new Uint8Array([2]));
+		const result = await DServerFile.appendFile(DCommon.infer("/tmp/mock"), new Uint8Array([2]));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("appends file in DENO env", async() => {
@@ -40,9 +41,9 @@ describe("appendFile", () => {
 		});
 
 		const data = new Uint8Array([3]);
-		const result = await DServerFile.appendFile("/tmp/mock", data);
+		const result = await DServerFile.appendFile(DCommon.infer("/tmp/mock"), data);
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(spy).toHaveBeenCalledWith("/tmp/mock", data, { append: true });
 	});
 
@@ -52,8 +53,8 @@ describe("appendFile", () => {
 			writeFile: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.appendFile("/tmp/mock", new Uint8Array([4]));
+		const result = await DServerFile.appendFile(DCommon.infer("/tmp/mock"), new Uint8Array([4]));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

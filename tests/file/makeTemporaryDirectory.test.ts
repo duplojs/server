@@ -1,7 +1,7 @@
-import { E, unwrap } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
-import { setDenoMock } from "tests/_utils/deno.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
 
 describe("makeTemporaryDirectory", () => {
 	afterEach(() => {
@@ -16,10 +16,10 @@ describe("makeTemporaryDirectory", () => {
 
 		const result = await DServerFile.makeTemporaryDirectory("prefix-");
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.mkdtemp).toHaveBeenCalledWith("prefix-");
-		if (E.isRight(result)) {
-			expect(unwrap(result)).toBe("/tmp/prefix-abc");
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result)).toBe("/tmp/prefix-abc");
 		}
 	});
 
@@ -31,7 +31,7 @@ describe("makeTemporaryDirectory", () => {
 
 		const result = await DServerFile.makeTemporaryDirectory("prefix-");
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("creates temporary directory in DENO env", async() => {
@@ -41,7 +41,7 @@ describe("makeTemporaryDirectory", () => {
 
 		const result = await DServerFile.makeTemporaryDirectory("prefix-");
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(makeTempDir).toHaveBeenCalledWith({ prefix: "prefix-" });
 	});
 
@@ -53,6 +53,6 @@ describe("makeTemporaryDirectory", () => {
 
 		const result = await DServerFile.makeTemporaryDirectory("prefix-");
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

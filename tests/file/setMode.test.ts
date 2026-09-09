@@ -1,7 +1,8 @@
-import { E } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
-import { setDenoMock } from "tests/_utils/deno.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
 
 describe("setMode", () => {
 	afterEach(() => {
@@ -29,9 +30,9 @@ describe("setMode", () => {
 			sticky: true,
 		};
 
-		const result = await DServerFile.setMode("/tmp/mock", mode);
+		const result = await DServerFile.setMode(DCommon.infer("/tmp/mock"), mode);
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.chmod).toHaveBeenCalledWith("/tmp/mock", 3045);
 	});
 
@@ -41,9 +42,9 @@ describe("setMode", () => {
 			chmod: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.setMode("/tmp/mock", 0o755);
+		const result = await DServerFile.setMode(DCommon.infer("/tmp/mock"), 0o755);
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("sets mode in NODE env with empty mode object", async() => {
@@ -52,9 +53,9 @@ describe("setMode", () => {
 			chmod: vi.fn().mockResolvedValue(undefined),
 		});
 
-		const result = await DServerFile.setMode("/tmp/mock", {});
+		const result = await DServerFile.setMode(DCommon.infer("/tmp/mock"), {});
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.chmod).toHaveBeenCalledWith("/tmp/mock", 0);
 	});
 
@@ -64,12 +65,12 @@ describe("setMode", () => {
 			chmod: vi.fn().mockResolvedValue(undefined),
 		});
 
-		const result = await DServerFile.setMode("/tmp/mock", {
+		const result = await DServerFile.setMode(DCommon.infer("/tmp/mock"), {
 			group: { write: true },
 			setGroupId: true,
 		});
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.chmod).toHaveBeenCalledWith("/tmp/mock", 1040);
 	});
 
@@ -78,9 +79,9 @@ describe("setMode", () => {
 		const chmod = vi.fn().mockResolvedValue(undefined);
 		setDenoMock({ chmod });
 
-		const result = await DServerFile.setMode("/tmp/mock", 0o644);
+		const result = await DServerFile.setMode(DCommon.infer("/tmp/mock"), 0o644);
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(chmod).toHaveBeenCalledWith("/tmp/mock", 0o644);
 	});
 
@@ -90,8 +91,8 @@ describe("setMode", () => {
 			chmod: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.setMode("/tmp/mock", 0o644);
+		const result = await DServerFile.setMode(DCommon.infer("/tmp/mock"), 0o644);
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

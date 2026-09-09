@@ -1,8 +1,10 @@
-import { E, unwrap } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "../_utils/fsPromises.mock";
-import { setDenoMock } from "../_utils/deno.mock";
-import { setBunMock } from "../_utils/bun.mock";
+import type * as DPath from "@duplojs/lang/path";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
+import { setBunMock } from "@tests/_utils/bun.mock";
 
 describe("readTextFile", () => {
 	afterEach(() => {
@@ -15,11 +17,11 @@ describe("readTextFile", () => {
 			readFile: vi.fn().mockResolvedValue("hello"),
 		});
 
-		const result = await DServerFile.readTextFile("/tmp/mock");
+		const result = await DServerFile.readTextFile<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result)).toBe("hello");
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result)).toBe("hello");
 		}
 	});
 
@@ -29,9 +31,9 @@ describe("readTextFile", () => {
 			readFile: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.readTextFile("/tmp/mock");
+		const result = await DServerFile.readTextFile<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("reads text file in DENO env", async() => {
@@ -40,11 +42,11 @@ describe("readTextFile", () => {
 			readTextFile: vi.fn().mockResolvedValue("deno"),
 		});
 
-		const result = await DServerFile.readTextFile("/tmp/mock");
+		const result = await DServerFile.readTextFile<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result)).toBe("deno");
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result)).toBe("deno");
 		}
 	});
 
@@ -54,9 +56,9 @@ describe("readTextFile", () => {
 			readTextFile: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.readTextFile("/tmp/mock");
+		const result = await DServerFile.readTextFile<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("reads text file in BUN env", async() => {
@@ -67,11 +69,11 @@ describe("readTextFile", () => {
 			}),
 		});
 
-		const result = await DServerFile.readTextFile("/tmp/mock");
+		const result = await DServerFile.readTextFile<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result)).toBe("bun");
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result)).toBe("bun");
 		}
 	});
 
@@ -83,8 +85,8 @@ describe("readTextFile", () => {
 			}),
 		});
 
-		const result = await DServerFile.readTextFile("/tmp/mock");
+		const result = await DServerFile.readTextFile<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

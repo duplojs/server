@@ -1,6 +1,9 @@
-import { A, E, unwrap } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DArray from "@duplojs/lang/array";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
+import type * as DPath from "@duplojs/lang/path";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
 
 describe("walkDirectory", () => {
 	afterEach(() => {
@@ -32,15 +35,15 @@ describe("walkDirectory", () => {
 			]),
 		});
 
-		const result = await DServerFile.walkDirectory("/tmp/demo");
+		const result = await DServerFile.walkDirectory<string & DPath.Path>(DCommon.infer("/tmp/demo"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.readdir).toHaveBeenCalledWith("/tmp/demo", {
 			recursive: false,
 			withFileTypes: true,
 		});
-		if (E.isRight(result)) {
-			const items = A.from(unwrap(result));
+		if (DEither.isRight(result)) {
+			const items = DArray.from(DEither.unwrapRight(result));
 			expect(items[0]?.getName()).toBe("file.json");
 			expect((items[0] as DServerFile.FileInterface).getMimeType()).toBe("application/json");
 			expect(items[1]?.getName()).toBe("sub");
@@ -54,8 +57,8 @@ describe("walkDirectory", () => {
 			readdir: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.walkDirectory("/tmp/demo");
+		const result = await DServerFile.walkDirectory<string & DPath.Path>(DCommon.infer("/tmp/demo"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

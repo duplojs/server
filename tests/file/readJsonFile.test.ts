@@ -1,8 +1,10 @@
-import { E, unwrap } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
+import type * as DPath from "@duplojs/lang/path";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
-import { setDenoMock } from "tests/_utils/deno.mock";
-import { setBunMock } from "tests/_utils/bun.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
+import { setBunMock } from "@tests/_utils/bun.mock";
 
 describe("readJsonFile", () => {
 	afterEach(() => {
@@ -12,14 +14,14 @@ describe("readJsonFile", () => {
 	it("reads json file in NODE env", async() => {
 		setEnvironment("NODE");
 		setFsPromisesMock({
-			readFile: vi.fn().mockResolvedValue("{\"acc\":1}"),
+			readFile: vi.fn().mockResolvedValue("{\"count\":1}"),
 		});
 
-		const result = await DServerFile.readJsonFile<{ a: number }>("/tmp/mock.json");
+		const result = await DServerFile.readJsonFile<string & DPath.Path>(DCommon.infer("/tmp/mock.json"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result)).toEqual({ acc: 1 });
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result)).toEqual({ count: 1 });
 		}
 	});
 
@@ -29,9 +31,9 @@ describe("readJsonFile", () => {
 			readFile: vi.fn().mockResolvedValue("{bad"),
 		});
 
-		const result = await DServerFile.readJsonFile("/tmp/mock.json");
+		const result = await DServerFile.readJsonFile<string & DPath.Path>(DCommon.infer("/tmp/mock.json"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("returns fail when DENO JSON parse throws", async() => {
@@ -40,33 +42,33 @@ describe("readJsonFile", () => {
 			readTextFile: vi.fn().mockResolvedValue("{bad"),
 		});
 
-		const result = await DServerFile.readJsonFile("/tmp/mock.json");
+		const result = await DServerFile.readJsonFile<string & DPath.Path>(DCommon.infer("/tmp/mock.json"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("reads json file in DENO env", async() => {
 		setEnvironment("DENO");
 		setDenoMock({
-			readTextFile: vi.fn().mockResolvedValue("{\"b\":2}"),
+			readTextFile: vi.fn().mockResolvedValue("{\"value\":2}"),
 		});
 
-		const result = await DServerFile.readJsonFile<{ b: number }>("/tmp/mock.json");
+		const result = await DServerFile.readJsonFile<string & DPath.Path>(DCommon.infer("/tmp/mock.json"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 	});
 
 	it("reads json file in BUN env", async() => {
 		setEnvironment("BUN");
 		setBunMock({
 			file: vi.fn().mockReturnValue({
-				text: vi.fn().mockResolvedValue("{\"c\":3}"),
+				text: vi.fn().mockResolvedValue("{\"value\":3}"),
 			}),
 		});
 
-		const result = await DServerFile.readJsonFile<{ c: number }>("/tmp/mock.json");
+		const result = await DServerFile.readJsonFile<string & DPath.Path>(DCommon.infer("/tmp/mock.json"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 	});
 
 	it("returns fail when BUN readJsonFile rejects", async() => {
@@ -77,8 +79,8 @@ describe("readJsonFile", () => {
 			}),
 		});
 
-		const result = await DServerFile.readJsonFile("/tmp/mock.json");
+		const result = await DServerFile.readJsonFile<string & DPath.Path>(DCommon.infer("/tmp/mock.json"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

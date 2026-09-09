@@ -2,6 +2,7 @@ interface DenoMock {
 	env?: {
 		toObject(): Record<string, string>;
 		set(key: string, value: string): void;
+		delete?(key: string): void;
 	};
 	cwd?(): string;
 	chdir?(path: string): void;

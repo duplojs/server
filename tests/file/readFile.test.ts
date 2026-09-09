@@ -1,8 +1,10 @@
-import { E, unwrap } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "../_utils/fsPromises.mock";
-import { setDenoMock } from "../_utils/deno.mock";
-import { setBunMock } from "../_utils/bun.mock";
+import type * as DPath from "@duplojs/lang/path";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
+import { setBunMock } from "@tests/_utils/bun.mock";
 
 describe("readFile", () => {
 	afterEach(() => {
@@ -15,11 +17,11 @@ describe("readFile", () => {
 			readFile: vi.fn().mockResolvedValue(new Uint8Array([1, 2, 3])),
 		});
 
-		const result = await DServerFile.readFile("/tmp/mock");
+		const result = await DServerFile.readFile<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(Array.from(unwrap(result))).toEqual([1, 2, 3]);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(Array.from(DEither.unwrapRight(result))).toEqual([1, 2, 3]);
 		}
 	});
 
@@ -29,9 +31,9 @@ describe("readFile", () => {
 			readFile: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.readFile("/tmp/mock");
+		const result = await DServerFile.readFile<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("reads file in DENO env", async() => {
@@ -40,11 +42,11 @@ describe("readFile", () => {
 			readFile: vi.fn().mockResolvedValue(new Uint8Array([4, 5])),
 		});
 
-		const result = await DServerFile.readFile("/tmp/mock");
+		const result = await DServerFile.readFile<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(Array.from(unwrap(result))).toEqual([4, 5]);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(Array.from(DEither.unwrapRight(result))).toEqual([4, 5]);
 		}
 	});
 
@@ -54,9 +56,9 @@ describe("readFile", () => {
 			readFile: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.readFile("/tmp/mock");
+		const result = await DServerFile.readFile<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("reads file in BUN env", async() => {
@@ -67,11 +69,11 @@ describe("readFile", () => {
 			}),
 		});
 
-		const result = await DServerFile.readFile("/tmp/mock");
+		const result = await DServerFile.readFile<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(Array.from(unwrap(result))).toEqual([7]);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(Array.from(DEither.unwrapRight(result))).toEqual([7]);
 		}
 	});
 
@@ -83,8 +85,8 @@ describe("readFile", () => {
 			}),
 		});
 
-		const result = await DServerFile.readFile("/tmp/mock");
+		const result = await DServerFile.readFile<string & DPath.Path>(DCommon.infer("/tmp/mock"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

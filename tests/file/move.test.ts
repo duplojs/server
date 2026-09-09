@@ -1,7 +1,8 @@
-import { E } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
 import { DServerFile, setEnvironment } from "@scripts";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
-import { setDenoMock } from "tests/_utils/deno.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
 
 describe("move", () => {
 	afterEach(() => {
@@ -14,9 +15,9 @@ describe("move", () => {
 			rename: vi.fn().mockResolvedValue(undefined),
 		});
 
-		const result = await DServerFile.move("/tmp/from", "/tmp/to");
+		const result = await DServerFile.move(DCommon.infer("/tmp/from"), DCommon.infer("/tmp/to"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(fs.rename).toHaveBeenCalledWith("/tmp/from", "/tmp/to");
 	});
 
@@ -26,9 +27,9 @@ describe("move", () => {
 			rename: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.move("/tmp/from", "/tmp/to");
+		const result = await DServerFile.move(DCommon.infer("/tmp/from"), DCommon.infer("/tmp/to"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("moves entry in DENO env", async() => {
@@ -36,9 +37,9 @@ describe("move", () => {
 		const rename = vi.fn().mockResolvedValue(undefined);
 		setDenoMock({ rename });
 
-		const result = await DServerFile.move("/tmp/from", "/tmp/to");
+		const result = await DServerFile.move(DCommon.infer("/tmp/from"), DCommon.infer("/tmp/to"));
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(rename).toHaveBeenCalledWith("/tmp/from", "/tmp/to");
 	});
 
@@ -48,8 +49,8 @@ describe("move", () => {
 			rename: vi.fn().mockRejectedValue(new Error("boom")),
 		});
 
-		const result = await DServerFile.move("/tmp/from", "/tmp/to");
+		const result = await DServerFile.move(DCommon.infer("/tmp/from"), DCommon.infer("/tmp/to"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });
