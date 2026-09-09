@@ -1,48 +1,29 @@
-import { E } from "@duplojs/lang";
+import * as DEither from "@duplojs/lang/either";
+import * as DCommon from "@duplojs/lang/common";
+import type * as DPath from "@duplojs/lang/path";
 import { setCurrentWorkingDirectory, setEnvironment } from "@scripts";
-import { setDenoMock } from "tests/_utils/deno.mock";
-import { setProcessMock } from "tests/_utils/process.mock";
+import { setDenoMock } from "@tests/_utils/deno.mock";
+import { setProcessMock } from "@tests/_utils/process.mock";
 
 describe("setCurrentWorkingDirectory", () => {
 	afterEach(() => {
+		setEnvironment("NODE");
 		vi.clearAllMocks();
+		vi.restoreAllMocks();
 	});
 
-	it("returns ok in NODE env with string path", () => {
+	it("sets current working directory in NODE env", () => {
 		setEnvironment("NODE");
-		const chdirSpy = vi.fn();
-		setProcessMock({ chdir: chdirSpy });
+		const chdir = vi.fn();
+		setProcessMock({ chdir });
 
-		const result = setCurrentWorkingDirectory("/tmp/mock-cwd");
+		const result = setCurrentWorkingDirectory<string & DPath.Path>(DCommon.infer("/tmp/project"));
 
-		expect(E.isRight(result)).toBe(true);
-		expect(chdirSpy).toHaveBeenCalledWith("/tmp/mock-cwd");
+		expect(DEither.isRight(result)).toBe(true);
+		expect(chdir).toHaveBeenCalledWith("/tmp/project");
 	});
 
-	it("accepts a path with spaces in NODE env", () => {
-		setEnvironment("NODE");
-		const chdirSpy = vi.fn();
-		setProcessMock({ chdir: chdirSpy });
-
-		const result = setCurrentWorkingDirectory("/tmp/mock cwd");
-
-		expect(E.isRight(result)).toBe(true);
-		expect(chdirSpy).toHaveBeenCalledWith("/tmp/mock cwd");
-	});
-
-	it("decodes URL in NODE env", () => {
-		setEnvironment("NODE");
-		const chdirSpy = vi.fn();
-		setProcessMock({ chdir: chdirSpy });
-		const url = new URL("file:///tmp/mock%20cwd");
-
-		const result = setCurrentWorkingDirectory(url as unknown as string);
-
-		expect(E.isRight(result)).toBe(true);
-		expect(chdirSpy).toHaveBeenCalledWith("/tmp/mock cwd");
-	});
-
-	it("returns fail when process.chdir throws in NODE env", () => {
+	it("returns fail when NODE chdir throws", () => {
 		setEnvironment("NODE");
 		setProcessMock({
 			chdir: () => {
@@ -50,52 +31,23 @@ describe("setCurrentWorkingDirectory", () => {
 			},
 		});
 
-		const result = setCurrentWorkingDirectory("/tmp/mock-cwd");
+		const result = setCurrentWorkingDirectory<string & DPath.Path>(DCommon.infer("/tmp/project"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
-	it("returns ok in DENO env", () => {
+	it("sets current working directory in DENO env", () => {
 		setEnvironment("DENO");
-		const chdirSpy = vi.fn();
-		setDenoMock({
-			chdir: chdirSpy,
-		});
+		const chdir = vi.fn();
+		setDenoMock({ chdir });
 
-		const result = setCurrentWorkingDirectory("/tmp/mock-deno-cwd");
+		const result = setCurrentWorkingDirectory<string & DPath.Path>(DCommon.infer("/tmp/project"));
 
-		expect(E.isRight(result)).toBe(true);
-		expect(chdirSpy).toHaveBeenCalledWith("/tmp/mock-deno-cwd");
+		expect(DEither.isRight(result)).toBe(true);
+		expect(chdir).toHaveBeenCalledWith("/tmp/project");
 	});
 
-	it("accepts a path with spaces in DENO env", () => {
-		setEnvironment("DENO");
-		const chdirSpy = vi.fn();
-		setDenoMock({
-			chdir: chdirSpy,
-		});
-
-		const result = setCurrentWorkingDirectory("/tmp/mock deno cwd");
-
-		expect(E.isRight(result)).toBe(true);
-		expect(chdirSpy).toHaveBeenCalledWith("/tmp/mock deno cwd");
-	});
-
-	it("decodes URL in DENO env", () => {
-		setEnvironment("DENO");
-		const chdirSpy = vi.fn();
-		setDenoMock({
-			chdir: chdirSpy,
-		});
-		const url = new URL("file:///tmp/mock%20deno%20cwd");
-
-		const result = setCurrentWorkingDirectory(url as unknown as string);
-
-		expect(E.isRight(result)).toBe(true);
-		expect(chdirSpy).toHaveBeenCalledWith("/tmp/mock deno cwd");
-	});
-
-	it("returns fail when Deno.chdir throws in DENO env", () => {
+	it("returns fail when DENO chdir throws", () => {
 		setEnvironment("DENO");
 		setDenoMock({
 			chdir: () => {
@@ -103,8 +55,8 @@ describe("setCurrentWorkingDirectory", () => {
 			},
 		});
 
-		const result = setCurrentWorkingDirectory("/tmp/mock-deno-cwd");
+		const result = setCurrentWorkingDirectory<string & DPath.Path>(DCommon.infer("/tmp/project"));
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

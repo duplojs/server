@@ -1,5 +1,5 @@
-import { type ExpectType, pipe } from "@duplojs/lang";
-import { clearBunMock } from "tests/_utils/bun.mock";
+import * as DCommon from "@duplojs/lang/common";
+import { clearBunMock } from "@tests/_utils/bun.mock";
 
 describe("getProcessArguments", () => {
 	const initialArgv = [...process.argv];
@@ -27,7 +27,7 @@ describe("getProcessArguments", () => {
 		process.argv = ["node", "script.ts", "--updated"];
 		const secondResult = getProcessArguments();
 
-		type _CheckResult = ExpectType<
+		type _CheckResult = DCommon.ExpectType<
 			typeof firstResult,
 			string[],
 			"strict"
@@ -72,9 +72,9 @@ describe("getProcessArguments", () => {
 		setEnvironment("NODE");
 		process.argv = ["node", "script.ts", "--pipe"];
 
-		const result = pipe("ignored", () => getProcessArguments());
+		const result = DCommon.pipe("ignored", () => getProcessArguments());
 
-		type _CheckResult = ExpectType<
+		type _CheckResult = DCommon.ExpectType<
 			typeof result,
 			string[],
 			"strict"

@@ -1,7 +1,8 @@
-import { type ExpectType, DP } from "@duplojs/lang";
+import * as DDataStructure from "@duplojs/lang/dataStructure";
+import * as DCommon from "@duplojs/lang/common";
 import { setEnvironment } from "@scripts";
 import { EnvironmentVariableError, environmentVariableOrThrow } from "@scripts/common";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
 
 describe("environmentVariableOrThrow", () => {
 	const initialProcessEnv = process.env;
@@ -12,7 +13,7 @@ describe("environmentVariableOrThrow", () => {
 		process.env = { ...initialProcessEnv };
 	});
 
-	it("returns parsed env when reading and schema validation succeed", async() => {
+	it("returns parsed env when reading and structure validation succeed", async() => {
 		setEnvironment("NODE");
 		process.env = {};
 		setFsPromisesMock({
@@ -21,19 +22,19 @@ describe("environmentVariableOrThrow", () => {
 
 		const result = await environmentVariableOrThrow(
 			{
-				APP_NAME: DP.string(),
+				APP_NAME: DDataStructure.string(),
 			},
 			{
-				includedFiles: ["/tmp/app.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/app.env")],
 				override: false,
 				justRead: true,
 			},
 		);
 
-		type _CheckOut = ExpectType<
+		type _CheckOut = DCommon.ExpectType<
 			typeof result,
 			{
-				APP_NAME: string;
+				readonly APP_NAME: string;
 			},
 			"strict"
 		>;
@@ -52,10 +53,10 @@ describe("environmentVariableOrThrow", () => {
 		await expect(
 			environmentVariableOrThrow(
 				{
-					APP_NAME: DP.string(),
+					APP_NAME: DDataStructure.string(),
 				},
 				{
-					includedFiles: ["/tmp/missing.env"],
+					includedEnvironmentFiles: [DCommon.infer("/tmp/missing.env")],
 					override: false,
 					justRead: false,
 				},
@@ -63,7 +64,7 @@ describe("environmentVariableOrThrow", () => {
 		).rejects.toBeInstanceOf(EnvironmentVariableError);
 	});
 
-	it("throws EnvironmentVariableError when schema validation fails", async() => {
+	it("throws EnvironmentVariableError when structure validation fails", async() => {
 		setEnvironment("NODE");
 		setFsPromisesMock({
 			readFile: vi.fn().mockResolvedValue("APP_NAME=duplo"),
@@ -72,10 +73,10 @@ describe("environmentVariableOrThrow", () => {
 		await expect(
 			environmentVariableOrThrow(
 				{
-					PORT: DP.number(),
+					PORT: DDataStructure.number(),
 				},
 				{
-					includedFiles: ["/tmp/app.env"],
+					includedEnvironmentFiles: [DCommon.infer("/tmp/app.env")],
 					override: false,
 					justRead: false,
 				},

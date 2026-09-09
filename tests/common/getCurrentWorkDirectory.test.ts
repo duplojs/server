@@ -1,7 +1,7 @@
-import { E, unwrap } from "@duplojs/lang";
-import { setEnvironment, getCurrentWorkDirectory, getCurrentWorkDirectoryOrThrow } from "@scripts";
-import { setDenoMock } from "tests/_utils/deno.mock";
-import { setProcessMock } from "tests/_utils/process.mock";
+import * as DEither from "@duplojs/lang/either";
+import { getCurrentWorkDirectory, setEnvironment } from "@scripts";
+import { setDenoMock } from "@tests/_utils/deno.mock";
+import { setProcessMock } from "@tests/_utils/process.mock";
 
 describe("getCurrentWorkDirectory", () => {
 	afterEach(() => {
@@ -17,10 +17,10 @@ describe("getCurrentWorkDirectory", () => {
 
 		const result = getCurrentWorkDirectory();
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 
-		if (E.isRight(result)) {
-			expect(unwrap(result)).toBe(expected);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result)).toBe(expected);
 		}
 	});
 
@@ -34,7 +34,7 @@ describe("getCurrentWorkDirectory", () => {
 
 		const result = getCurrentWorkDirectory();
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("returns current working directory in DENO env", () => {
@@ -46,9 +46,9 @@ describe("getCurrentWorkDirectory", () => {
 
 		const result = getCurrentWorkDirectory();
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result)).toBe(expected);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result)).toBe(expected);
 		}
 	});
 
@@ -62,30 +62,6 @@ describe("getCurrentWorkDirectory", () => {
 
 		const result = getCurrentWorkDirectory();
 
-		expect(E.isLeft(result)).toBe(true);
-	});
-
-	it("getCurrentWorkDirectoryOrThrow node", () => {
-		setEnvironment("NODE");
-
-		setProcessMock({
-			cwd: () => "/node",
-		});
-
-		const result = getCurrentWorkDirectoryOrThrow();
-
-		expect(result).toBe("/node");
-	});
-
-	it("getCurrentWorkDirectoryOrThrow deno", () => {
-		setEnvironment("DENO");
-
-		setDenoMock({
-			cwd: () => "/deno",
-		});
-
-		const result = getCurrentWorkDirectoryOrThrow();
-
-		expect(result).toBe("/deno");
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 });

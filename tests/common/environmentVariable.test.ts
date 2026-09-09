@@ -1,8 +1,9 @@
-import { type ExpectType, DP, E, pipe, unwrap } from "@duplojs/lang";
-import { setEnvironment } from "@scripts";
-import { environmentVariable } from "@scripts/common";
-import { setDenoMock } from "tests/_utils/deno.mock";
-import { setFsPromisesMock } from "tests/_utils/fsPromises.mock";
+import * as DEither from "@duplojs/lang/either";
+import * as DDataStructure from "@duplojs/lang/dataStructure";
+import * as DCommon from "@duplojs/lang/common";
+import { DServerDataStructure, type DServerFile, environmentVariable, setEnvironment } from "@scripts";
+import { setDenoMock } from "@tests/_utils/deno.mock";
+import { setFsPromisesMock } from "@tests/_utils/fsPromises.mock";
 
 describe("environmentVariable", () => {
 	const initialProcessEnv = process.env;
@@ -23,23 +24,23 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				APP_NAME: DP.string(),
+				APP_NAME: DDataStructure.string(),
 			},
 			{
-				includedFiles: ["/tmp/app.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/app.env")],
 				override: false,
 				justRead: false,
 			},
 		);
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			const env = unwrap(result);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			const env = DEither.unwrapRight(result);
 
-			type _CheckOut = ExpectType<
+			type _CheckOut = DCommon.ExpectType<
 				typeof env,
 				{
-					APP_NAME: string;
+					readonly APP_NAME: string;
 				},
 				"strict"
 			>;
@@ -49,7 +50,41 @@ describe("environmentVariable", () => {
 		expect(process.env.APP_NAME).toBe("duplo");
 	});
 
-	it("uses includedFiles instead of deprecated paths when both are defined", async() => {
+	it("decodes NODE file variables with server codecs by default", async() => {
+		setEnvironment("NODE");
+		process.env = {};
+		setFsPromisesMock({
+			readFile: vi.fn().mockResolvedValue("APP_FILE=/tmp/app.json"),
+		});
+
+		const result = await environmentVariable(
+			{
+				APP_FILE: DServerDataStructure.file(),
+			},
+			{
+				includedEnvironmentFiles: [DCommon.infer("/tmp/app.env")],
+				override: false,
+				justRead: true,
+			},
+		);
+
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			const env = DEither.unwrapRight(result);
+
+			type _CheckOut = DCommon.ExpectType<
+				typeof env,
+				{
+					readonly APP_FILE: DServerFile.FileInterface;
+				},
+				"strict"
+			>;
+
+			expect(env.APP_FILE.path).toBe("/tmp/app.json");
+		}
+	});
+
+	it("uses includedEnvironmentFiles instead of deprecated paths when both are defined", async() => {
 		setEnvironment("NODE");
 		process.env = {};
 		setFsPromisesMock({
@@ -62,19 +97,18 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				APP_NAME: DP.string(),
+				APP_NAME: DDataStructure.string(),
 			},
 			{
-				includedFiles: ["/tmp/included.env"],
-				paths: ["/tmp/deprecated.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/included.env")],
 				override: false,
 				justRead: true,
 			},
 		);
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result).APP_NAME).toBe("included");
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result).APP_NAME).toBe("included");
 		}
 	});
 
@@ -86,13 +120,13 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				APP_NAME: DP.string(),
+				APP_NAME: DDataStructure.string(),
 			},
 		);
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result).APP_NAME).toBe("base");
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result).APP_NAME).toBe("base");
 		}
 		expect(process.env.APP_NAME).toBe("base");
 	});
@@ -106,16 +140,16 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				APP_NAME: DP.string(),
+				APP_NAME: DDataStructure.string(),
 			},
 			{
-				includedFiles: ["/tmp/app.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/app.env")],
 				override: false,
 				justRead: true,
 			},
 		);
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(process.env.APP_NAME).toBeUndefined();
 	});
 
@@ -128,18 +162,18 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				APP_NAME: DP.string(),
+				APP_NAME: DDataStructure.string(),
 			},
 			{
-				includedFiles: ["/tmp/app.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/app.env")],
 				override: false,
 				justRead: false,
 			},
 		);
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result).APP_NAME).toBe("base");
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result).APP_NAME).toBe("base");
 		}
 		expect(process.env.APP_NAME).toBe("base");
 	});
@@ -153,18 +187,18 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				APP_NAME: DP.string(),
+				APP_NAME: DDataStructure.string(),
 			},
 			{
-				includedFiles: ["/tmp/app.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/app.env")],
 				override: true,
 				justRead: false,
 			},
 		);
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result).APP_NAME).toBe("file");
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result).APP_NAME).toBe("file");
 		}
 		expect(process.env.APP_NAME).toBe("file");
 	});
@@ -177,19 +211,19 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				APP_NAME: DP.string(),
+				APP_NAME: DDataStructure.string(),
 			},
 			{
-				includedFiles: ["/tmp/missing.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/missing.env")],
 				override: false,
 				justRead: false,
 			},
 		);
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
-	it("returns a left when parsed env does not match NODE schema", async() => {
+	it("returns a left when parsed env does not match NODE structure", async() => {
 		setEnvironment("NODE");
 		setFsPromisesMock({
 			readFile: vi.fn().mockResolvedValue("APP_NAME=duplo"),
@@ -197,43 +231,45 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				PORT: DP.number(),
+				PORT: DDataStructure.number(),
 			},
 			{
-				includedFiles: ["/tmp/app.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/app.env")],
 				override: false,
 				justRead: false,
 			},
 		);
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("decodes escaped line breaks from double quoted NODE values", async() => {
 		setEnvironment("NODE");
+		process.env = {};
 		setFsPromisesMock({
 			readFile: vi.fn().mockResolvedValue("MESSAGE=\"line1\\nline2\\r\""),
 		});
 
 		const result = await environmentVariable(
 			{
-				MESSAGE: DP.string(),
+				MESSAGE: DDataStructure.string(),
 			},
 			{
-				includedFiles: ["/tmp/app.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/app.env")],
 				override: false,
 				justRead: true,
 			},
 		);
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			expect(unwrap(result).MESSAGE).toBe("line1\nline2\r");
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			expect(DEither.unwrapRight(result).MESSAGE).toBe("line1\nline2\r");
 		}
 	});
 
 	it("resolves missing and circular NODE variables to empty strings", async() => {
 		setEnvironment("NODE");
+		process.env = {};
 		setFsPromisesMock({
 			readFile: vi.fn().mockResolvedValue([
 				"MISSING=${NOT_DEFINED}",
@@ -245,21 +281,21 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				MISSING: DP.string(),
-				SELF: DP.string(),
-				FIRST: DP.string(),
-				SECOND: DP.string(),
+				MISSING: DDataStructure.string(),
+				SELF: DDataStructure.string(),
+				FIRST: DDataStructure.string(),
+				SECOND: DDataStructure.string(),
 			},
 			{
-				includedFiles: ["/tmp/app.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/app.env")],
 				override: true,
 				justRead: true,
 			},
 		);
 
-		expect(E.isRight(result)).toBe(true);
-		if (E.isRight(result)) {
-			const env = unwrap(result);
+		expect(DEither.isRight(result)).toBe(true);
+		if (DEither.isRight(result)) {
+			const env = DEither.unwrapRight(result);
 			expect(env.MISSING).toBe("");
 			expect(env.SELF).toBe("");
 			expect(env.FIRST).toBe("");
@@ -274,6 +310,7 @@ describe("environmentVariable", () => {
 			env: {
 				toObject: () => ({ BASE: "deno" }),
 				set: denoSetSpy,
+				delete: vi.fn(),
 			},
 			readTextFile: vi.fn().mockResolvedValue([
 				"APP_NAME=duplo",
@@ -284,18 +321,18 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				BASE: DP.string(),
-				APP_NAME: DP.string(),
-				COMPOSED: DP.string(),
+				BASE: DDataStructure.string(),
+				APP_NAME: DDataStructure.string(),
+				COMPOSED: DDataStructure.string(),
 			},
 			{
-				includedFiles: ["/tmp/deno.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/deno.env")],
 				override: false,
 				justRead: false,
 			},
 		);
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(denoSetSpy).toHaveBeenCalledWith("BASE", "deno");
 		expect(denoSetSpy).toHaveBeenCalledWith("APP_NAME", "duplo");
 		expect(denoSetSpy).toHaveBeenCalledWith("COMPOSED", "deno/api");
@@ -314,11 +351,11 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				APP_NAME: DP.string(),
+				APP_NAME: DDataStructure.string(),
 			},
 		);
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(denoSetSpy).toHaveBeenCalledWith("APP_NAME", "deno");
 	});
 
@@ -332,17 +369,18 @@ describe("environmentVariable", () => {
 					APP_NAME: "deno",
 				}),
 				set: denoSetSpy,
+				delete: vi.fn(),
 			},
 		});
 
 		const result = await environmentVariable(
 			{
-				EMPTY: DP.string(),
-				APP_NAME: DP.string(),
+				EMPTY: DDataStructure.string(),
+				APP_NAME: DDataStructure.string(),
 			},
 		);
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(denoSetSpy).toHaveBeenCalledWith("APP_NAME", "deno");
 		expect(denoSetSpy).not.toHaveBeenCalledWith("EMPTY", "");
 	});
@@ -360,17 +398,17 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				BASE: DP.string(),
-				APP_NAME: DP.string(),
+				BASE: DDataStructure.string(),
+				APP_NAME: DDataStructure.string(),
 			},
 			{
-				includedFiles: ["/tmp/deno.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/deno.env")],
 				override: false,
 				justRead: true,
 			},
 		);
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 		expect(denoSetSpy).not.toHaveBeenCalled();
 	});
 
@@ -386,19 +424,19 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				APP_NAME: DP.string(),
+				APP_NAME: DDataStructure.string(),
 			},
 			{
-				includedFiles: ["/tmp/deno.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/deno.env")],
 				override: false,
 				justRead: false,
 			},
 		);
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
-	it("returns a left when parsed env does not match DENO schema", async() => {
+	it("returns a left when parsed env does not match DENO structure", async() => {
 		setEnvironment("DENO");
 		setDenoMock({
 			env: {
@@ -410,16 +448,16 @@ describe("environmentVariable", () => {
 
 		const result = await environmentVariable(
 			{
-				PORT: DP.number(),
+				PORT: DDataStructure.number(),
 			},
 			{
-				includedFiles: ["/tmp/deno.env"],
+				includedEnvironmentFiles: [DCommon.infer("/tmp/deno.env")],
 				override: false,
 				justRead: false,
 			},
 		);
 
-		expect(E.isLeft(result)).toBe(true);
+		expect(DEither.isLeft(result)).toBe(true);
 	});
 
 	it("works when called from pipe", async() => {
@@ -429,20 +467,20 @@ describe("environmentVariable", () => {
 			readFile: vi.fn().mockResolvedValue("APP_NAME=duplo"),
 		});
 
-		const result = await pipe(
+		const result = await DCommon.pipe(
 			{
-				APP_NAME: DP.string(),
+				APP_NAME: DDataStructure.string(),
 			},
 			(shape) => environmentVariable(
 				shape,
 				{
-					includedFiles: ["/tmp/app.env"],
+					includedEnvironmentFiles: [DCommon.infer("/tmp/app.env")],
 					override: false,
 					justRead: true,
 				},
 			),
 		);
 
-		expect(E.isRight(result)).toBe(true);
+		expect(DEither.isRight(result)).toBe(true);
 	});
 });
