@@ -2,7 +2,7 @@ import * as DCommon from "@duplojs/lang/common";
 import type * as DKind from "@duplojs/lang/kind";
 import * as DArray from "@duplojs/lang/array";
 import * as DString from "@duplojs/lang/string";
-import { createKind } from "@scripts/kind";
+import { createKind } from "../kind";
 import { type Error, SymbolCommandError } from "../error";
 
 export const optionKind = createKind("command-option");
@@ -65,7 +65,7 @@ export interface CreateOptionConstructorParams<
 	): NoInfer<GenericOption>;
 }
 
-export function createOption<
+export function constructOption<
 	GenericKindHandler extends DKind.Handler,
 	GenericConstructor extends (
 		(...args: any[]) => (
@@ -82,7 +82,7 @@ export function createOption<
 	) => GenericConstructor,
 ): GenericConstructor;
 
-export function createOption(
+export function constructOption(
 	kindHandler: DKind.Handler,
 	createConstructor: (
 		params: CreateOptionConstructorParams,

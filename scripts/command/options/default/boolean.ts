@@ -1,7 +1,7 @@
 import type * as DCommon from "@duplojs/lang/common";
 import type * as DKind from "@duplojs/lang/kind";
-import { createOption, type Option } from "../base";
-import { createKind } from "@scripts/kind";
+import { constructOption, type Option } from "../base";
+import { createKind } from "@scripts/command/kind";
 
 export const booleanOptionKind = createKind("command-boolean-option");
 
@@ -20,7 +20,7 @@ export interface CreateBooleanOptionParams {
 	aliases?: readonly string[];
 }
 
-export const createBooleanOption = createOption(
+export const createBooleanOption = constructOption(
 	booleanOptionKind,
 	({ init }) => <
 		GenericName extends string,
@@ -33,7 +33,7 @@ export const createBooleanOption = createOption(
 		name,
 		(self, value, error) => {
 			if (typeof value === "string") {
-				return error.addUnexpectedOptionValueCommandIssue(
+				return error.addUnexpectedOptionValueIssue(
 					self.name,
 					value,
 				);

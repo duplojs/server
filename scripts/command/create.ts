@@ -3,7 +3,7 @@ import type * as DKind from "@duplojs/lang/kind";
 import * as DArray from "@duplojs/lang/array";
 import * as DGenerator from "@duplojs/lang/generator";
 import * as DObject from "@duplojs/lang/object";
-import { createKind } from "../kind";
+import { createKind } from "./kind";
 import type { Option } from "./options";
 import { SymbolCommandError, type Error } from "./error";
 import { logCommandHelp, helpOption } from "./help";
@@ -83,7 +83,7 @@ export type CreateCommandExecuteParams<
 			? {}
 			: {
 				options: {
-					[GenericOption in GenericOptions[number] as GenericOption["name"]]: Exclude<
+					readonly [GenericOption in GenericOptions[number] as GenericOption["name"]]: Exclude<
 						Awaited<ReturnType<
 							GenericOption["execute"]
 						>>,
@@ -97,7 +97,7 @@ export type CreateCommandExecuteParams<
 			? {}
 			: {
 				args: {
-					[GenericArgument in GenericArguments[number] as GenericArgument["name"]]: Exclude<
+					readonly [GenericArgument in GenericArguments[number] as GenericArgument["name"]]: Exclude<
 						Awaited<ReturnType<
 							GenericArgument["execute"]
 						>>,
@@ -274,6 +274,7 @@ export function create(
 
 			return;
 		},
+		[commandKind.runTimeKey]: null,
 	} satisfies DKind.Remove<Command> as never;
 
 	return self;

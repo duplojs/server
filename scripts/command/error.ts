@@ -4,7 +4,8 @@ import * as DString from "@duplojs/lang/string";
 import * as DModeling from "@duplojs/lang/modeling";
 import * as DArray from "@duplojs/lang/array";
 import * as DPattern from "@duplojs/lang/pattern";
-import type * as DDataStructure from "@duplojs/lang/dataStructure";
+import * as DDataStructure from "@duplojs/lang/dataStructure";
+import { DServerDataStructure } from "@scripts";
 
 export interface OptionIssueBase {
 	readonly data: unknown;
@@ -229,24 +230,42 @@ export function createError(
 	};
 }
 
-export function interpretCommandError(
-	error: Error,
+export function interpretDataStructureError(
+	error: DDataStructure.Error,
 	dataStructureErrorInterpreter: DDataStructure.ErrorInterpreter,
-): string {
-	return DPrinter.renderParagraph(
-		[
-			DPrinter.render(
+) {
+	return DCommon.pipe(
+		dataStructureErrorInterpreter(error),
+		DArray.map(
+			({ interpretedMessage, path }) => DPrinter.render(
 				[
-					DPrinter.colorizedBold("Command failed", "red"),
-					DPrinter.back,
 					DPrinter.indent(1),
-					DPrinter.colorizedBold("COMMAND: ", "cyan"),
-					DString.join(error.currentPath, " "),
+					"↳ ",
+					DPrinter.colorizedBold(path || "<value>", "cyan"),
+					" : ",
+					DPrinter.colorizedBold(
+						interpretedMessage.subSource
+							?? interpretedMessage.interpretedSubSource
+							?? interpretedMessage.source
+							?? interpretedMessage.interpretedSource
+							?? "unknown data structure error.",
+						"red",
+					),
 				],
 				"",
 			),
+		),
+	);
+}
+
+export function interpretErrorIssues(
+	issues: readonly Issues[],
+	dataStructureErrorInterpreter: DDataStructure.ErrorInterpreter,
+) {
+	return DPrinter.renderParagraph(
+		[
 			DArray.map(
-				error.issues,
+				issues,
 				DPattern.matchWithTaggedObject({
 					DataStructureArgumentIssue: ({ argumentName, dataStructureError }) => [
 						DPrinter.render(
@@ -320,35 +339,46 @@ export function interpretCommandError(
 					],
 				}),
 			),
-			error.issues.length === 0 && "No issue found",
+			issues.length === 0 && "No issue found",
 		],
 	);
 }
 
-export function interpretDataStructureError(
-	error: DDataStructure.Error,
-	dataStructureErrorInterpreter: DDataStructure.ErrorInterpreter,
-) {
-	return DCommon.pipe(
-		dataStructureErrorInterpreter(error),
-		DArray.map(
-			({ interpretedMessage, path }) => DPrinter.render(
+const defaultDataStructureErrorInterpreter = DDataStructure.createErrorInterpreter(
+	DServerDataStructure.defaultErrorInterpreterDataStructureDictionary,
+	DServerDataStructure.defaultErrorInterpreterCodecDictionary,
+);
+
+export function interpretExecCommandError(
+	error: Error,
+	dataStructureErrorInterpreter?: DDataStructure.ErrorInterpreter,
+): string {
+	return DPrinter.renderParagraph(
+		[
+			DPrinter.render(
 				[
+					DPrinter.colorizedBold("Command failed", "red"),
+					DPrinter.back,
 					DPrinter.indent(1),
-					"↳ ",
-					DPrinter.colorizedBold(path || "<value>", "cyan"),
-					" : ",
-					DPrinter.colorizedBold(
-						interpretedMessage.subSource
-							?? interpretedMessage.interpretedSubSource
-							?? interpretedMessage.source
-							?? interpretedMessage.interpretedSource
-							?? "unknown data structure error.",
-						"red",
-					),
+					DPrinter.colorizedBold("COMMAND: ", "cyan"),
+					DString.join(error.currentPath, " "),
 				],
 				"",
 			),
-		),
+			interpretErrorIssues(error.issues, dataStructureErrorInterpreter ?? defaultDataStructureErrorInterpreter),
+		],
+	);
+}
+
+export function interpretExecOptionsError(
+	error: Error,
+	dataStructureErrorInterpreter?: DDataStructure.ErrorInterpreter,
+): string {
+	return DPrinter.renderParagraph(
+		[
+			DPrinter.colorizedBold("Invalid options", "red"),
+			DPrinter.back,
+			interpretErrorIssues(error.issues, dataStructureErrorInterpreter ?? defaultDataStructureErrorInterpreter),
+		],
 	);
 }

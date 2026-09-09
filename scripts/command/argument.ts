@@ -3,7 +3,7 @@ import type * as DKind from "@duplojs/lang/kind";
 import * as DEither from "@duplojs/lang/either";
 import type * as DDataStructure from "@duplojs/lang/dataStructure";
 import * as DServerDataStructure from "@scripts/dataStructure";
-import { createKind } from "@scripts/kind";
+import { createKind } from "./kind";
 import { type Error, type SymbolCommandError } from "./error";
 import { type EligibleType } from "./types";
 
@@ -64,7 +64,7 @@ export function createArgument(
 		optional: params?.optional ?? false,
 		execute: async(argument, error) => {
 			if (self.optional === false && argument === undefined) {
-				return error.addRequiredArgumentCommandIssue(
+				return error.addRequiredArgumentIssue(
 					self.name,
 				);
 			}
@@ -79,7 +79,7 @@ export function createArgument(
 			);
 
 			if (DEither.isLeft(result)) {
-				return error.addDataStructureArgumentCommandIssue(
+				return error.addDataStructureArgumentIssue(
 					self.name,
 					argument,
 					DEither.unwrapLeft(result),

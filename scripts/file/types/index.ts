@@ -1,1 +1,1 @@
-export * from "./fileSystemLeft";
+export type * from "./fileSystemLeft";

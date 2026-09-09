@@ -5,3 +5,5 @@ export * from "./options";
 export * from "./create";
 export * from "./exec";
 export * from "./execOptions";
+export * from "./error";
+export * from "./help";

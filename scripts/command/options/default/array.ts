@@ -1,13 +1,14 @@
 import * as DCommon from "@duplojs/lang/common";
 import type * as DKind from "@duplojs/lang/kind";
 import * as DDataStructure from "@duplojs/lang/dataStructure";
+import * as DString from "@duplojs/lang/string";
 import type * as DNumber from "@duplojs/lang/number";
 import type * as DArray from "@duplojs/lang/array";
 import * as DEither from "@duplojs/lang/either";
 import * as DServerDataStructure from "@scripts/dataStructure";
-import { createOption, type Option } from "../base";
+import { constructOption, type Option } from "../base";
 import type { EligibleType } from "../../types";
-import { createKind } from "../../../kind";
+import { createKind } from "@scripts/command/kind";
 
 const defaultSeparator = ",";
 
@@ -39,7 +40,7 @@ export interface CreateArrayOptionParams {
 	separator?: string;
 }
 
-export const createArrayOption = createOption(
+export const createArrayOption = constructOption(
 	arrayOptionKind,
 	({ init }) => <
 		GenericName extends string,
@@ -76,7 +77,7 @@ export const createArrayOption = createOption(
 		name,
 		async(self, value, error) => {
 			if (value === null && self.required === true) {
-				return error.addRequiredOptionCommandIssue(
+				return error.addRequiredOptionIssue(
 					self.name,
 				);
 			}
@@ -86,18 +87,18 @@ export const createArrayOption = createOption(
 			}
 
 			if (value === undefined) {
-				return error.addRequiredOptionValueCommandIssue(
+				return error.addRequiredOptionValueIssue(
 					self.name,
 				);
 			}
 
 			const result = await self.dataStructure.asyncUnsafeDecode(
 				DServerDataStructure.codecsString,
-				value,
+				DString.split(value, self.separator),
 			);
 
 			if (DEither.isLeft(result)) {
-				return error.addDataStructureOptionCommandIssue(
+				return error.addDataStructureOptionIssue(
 					self.name,
 					value,
 					DEither.unwrapLeft(result),

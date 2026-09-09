@@ -1,8 +1,9 @@
 import type * as DCommon from "@duplojs/lang/common";
 import * as DEither from "@duplojs/lang/either";
 import * as DServerCommon from "@scripts/common";
+import type * as DDataStructure from "@duplojs/lang/dataStructure";
 import { type CreateCommandExecuteParams, type CreateCommandParams, type Subjects, create } from "./create";
-import { createError, interpretCommandError, SymbolCommandError, type Error } from "./error";
+import { createError, interpretExecCommandError, SymbolCommandError, type Error } from "./error";
 import type { Option } from "./options";
 import type { Argument } from "./argument";
 
@@ -14,6 +15,7 @@ export interface ExecCommandParams<
 		GenericSubjects
 	> {
 	displayName?: string;
+	dataStructureErrorInterpreter?: DDataStructure.ErrorInterpreter;
 }
 
 export function exec(
@@ -66,8 +68,8 @@ export async function exec(
 	);
 
 	if (result === SymbolCommandError) {
-		// eslint-disable-next-line no-console
-		console.error(interpretCommandError(error));
+		// oxlint-disable-next-line no-console
+		console.error(interpretExecCommandError(error, params?.dataStructureErrorInterpreter));
 		return DEither.error(error);
 	}
 
