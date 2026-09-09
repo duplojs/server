@@ -241,11 +241,11 @@ describe("help", () => {
 		const help = DServerCommand.renderArgumentsHelp(
 			[
 				DServerCommand.createArgument("sizeRange", DServerDataStructure.file([
-DServerDataStructure.size({
- min: 1024,
-					max: 2048 
-})
-])),
+					DServerDataStructure.size({
+						min: 1024,
+						max: 2048,
+					}),
+				])),
 				DServerCommand.createArgument("sizeMin", DServerDataStructure.file([DServerDataStructure.size({ min: 1024 })])),
 				DServerCommand.createArgument("sizeMax", DServerDataStructure.file([DServerDataStructure.size({ max: 1536 })])),
 				DServerCommand.createArgument("sizeAny", DServerDataStructure.file([DServerDataStructure.size({})])),

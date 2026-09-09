@@ -1,0 +1,32 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`command feature on node > prints command help without executing the command 1`] = `
+"COMMAND  cli
+	Integration command.
+USAGE
+	cli <target> [options]
+ARGUMENTS
+	target      string · required
+		Deployment target.
+		↳ not empty
+OPTIONS
+	-v, --verbose
+		boolean
+		Print detailed logs.
+	--count <value>
+		number · required
+		Number of executions.
+		↳ min 1
+		↳ integer
+	-t, --tags <value...>
+		string[] · optional
+		Execution tags.
+		↳ item min length 2
+		↳ items 1..3"
+`;
+
+exports[`command feature on node > returns a command error from exec 1`] = `
+"Command failed	COMMAND: read
+	ARGUMENT: --id
+	↳ <value> : Expected a string representing a number for the string number codec."
+`;
